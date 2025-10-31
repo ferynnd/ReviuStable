@@ -10,4 +10,13 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    server: {
+        host: '0.0.0.0', // biar bisa diakses dari LAN
+        port: 5173,
+        cors: true,        // 🔥 IZINKAN akses cross-origin
+        strictPort: true,
+        hmr: {
+            host: '192.168.1.30', // Ganti dengan IP WiFi kamu
+        },
+    },
 });

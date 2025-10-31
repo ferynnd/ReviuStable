@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('username', 100)->unique();
             $table->string('fullname', 255);
             $table->string('email', 150)->unique();
-            $table->string('password');
+            $table->string('password')->default('$2y$12$mr7SBWhMQksNxnlFqh3aN.tf0LrIhszW7LEH2fC6.q.Bi5N.NW7hO');
+            $table->text('bio')->nullable();
             $table->string('image')->nullable();
             $table->timestamp('last_login')->nullable();
             $table->boolean('is_active')->default(true);

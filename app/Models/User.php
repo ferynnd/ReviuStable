@@ -18,8 +18,7 @@ class User extends Authenticatable
     {
         parent::__construct($attributes);
         // Jika baris ini muncul saat middleware dipanggil, berarti model berhasil dimuat.
-        // Jika TIDAK muncul, artinya user gagal dimuat dari ID sesi.
-        \Log::debug('>>> Model User Dikonstruksi'); 
+       
     }
 
     protected $fillable = [
@@ -27,6 +26,7 @@ class User extends Authenticatable
         'fullname',
         'email',
         'password',
+        'bio',
         'image',
         'last_login',
         'is_active',
@@ -38,11 +38,6 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-
-    // public function getAuthIdentifierName()
-    // {
-    //     return 'username';
-    // }
 
     protected function casts(): array
     {

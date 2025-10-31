@@ -10,19 +10,19 @@
                     <form class="w-full mx-auto mt-7" action="{{route('login.submit')}}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="username" class="block mb-2 text-sm font-medium text-white">Username</label>
-                            <input type="username" name="username" id="username" value="{{ old("username") }}" class="border border-sky-400 text-white text-sm rounded-md  block w-full p-4 focus:ring-0 focus:outline-none " placeholder="Masukan Username" required />
+                            <label for="username" class="block mb-2 text-md font-medium text-white">Username</label>
+                            <input type="username" name="username" id="username" value="{{ old("username") }}" class="border border-sky-400 text-white text-md rounded-md  block w-full p-4 focus:ring-0 focus:outline-none " placeholder="Masukan Username" required />
                         </div>
                         <div class="mb-7">
-                            <label for="password" class="block mb-2 text-sm font-medium text-white">Password</label>
+                            <label for="password" class="block mb-2 text-md font-medium text-white">Password</label>
                             <div x-data="{ showPassword: false }" class="relative">
-                                <input type="password" id="password" name="password" value="{{ old("password") }}"  x-bind:type="showPassword ? 'text' : 'password'"  class="border border-sky-400 text-white text-sm rounded-md  block w-full p-4 focus:ring-0 focus:outline-none" placeholder="Masukan Password" required />
+                                <input type="password" id="password" name="password" value="{{ old("password") }}"  x-bind:type="showPassword ? 'text' : 'password'"  class="border border-sky-400 text-white text-md rounded-md  block w-full p-4 focus:ring-0 focus:outline-none" placeholder="Masukan Password" required />
                                 <button  class="absolute top-0 right-4 bottom-0" type="button" x-on:click="showPassword = !showPassword">
                                     <span class="text-white" x-html="showPassword ? `<i class='fa-solid fa-eye-slash'></i>` : `<i class='fa-solid fa-eye'></i>`"></span>
                                 </button>
                             </div>
                         </div>
-                        <button type="submit" class="text-white bg-gradient-to-b from-cyan-400 to-sky-500 hover:from-sky-500 hover:to-blue-600 focus:outline-none font-medium rounded-md text-sm w-full block px-5 py-4 text-center">Login</button>
+                        <button type="submit" class="text-white bg-gradient-to-b from-cyan-400 to-sky-500 hover:from-sky-500 hover:to-blue-600 focus:outline-none  rounded-md text-lg font-semibold w-full block px-5 py-4 text-center">Login</button>
                     </form>
 
                 </div>

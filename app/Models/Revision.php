@@ -12,6 +12,7 @@ class Revision extends Model
         'comment',
         'rev_at',
         'rev_number',
+        'new_post_id',
     ];
 
     protected function casts(): array
@@ -23,8 +24,14 @@ class Revision extends Model
 
     public function post() 
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(Post::class, 'post_id');
     }
+
+    public function newPost()
+    {
+        return $this->belongsTo(Post::class, 'new_post_id');
+    }
+
 
     public function user() 
     {

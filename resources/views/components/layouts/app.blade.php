@@ -12,23 +12,20 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        @stack('link')
 
         <!-- Styles / Scripts -->
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
 
-        @stack('link')
+        @stack('css')
 
-        <link rel="stylesheet" href="{{ asset('vendor/notify/notify.css') }}">
     </head>
     <body class="bg-slate-900">
-
+        @include('sweetalert::alert')
+        @include('components.alert-session')
         {{$slot}}
-
-        <x-notify::notify />
-        @notifyJs
-        
         @stack('js')
     </body>
 </html>

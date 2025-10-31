@@ -5,7 +5,6 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-
 @font-face {
   font-family: 'Satoshi-Light';
   src: url('fonts/Satoshi-Light.ttf') format('truetype');
