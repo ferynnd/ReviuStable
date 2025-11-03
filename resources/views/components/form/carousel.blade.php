@@ -1,0 +1,349 @@
+@props([
+    'status' => [],
+    'selectedStatus' => 1,
+    'postAt' => date('Y-m-d')
+])
+
+<form
+    action="{{ route('post.store') }}"
+    method="POST"
+    enctype="multipart/form-data"
+    class="space-y-6 w-full"
+    x-data="postForm()"
+    x-init="
+        $nextTick(() => {
+            selectedStatus = {{ $selectedStatus }};
+            postAt = '{{ $postAt }}';
+        })
+    "
+>
+    @csrf
+
+    {{-- Hardcode content feed type --}}
+    <input type="hidden" name="content_type" value="2">
+
+    <div class="flex w-full flex-col lg:flex-row gap-3">
+        <div class="space-y-2 flex-1">
+            <label for="title" class="block text-sm font-semibold text-white">Title</label>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                x-model="title"
+                placeholder="Judul postingan.."
+                class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150"
+            >
+        </div>
+    </div>
+
+    <div class="flex w-full flex-row gap-3">
+        <div class="w-1/2 space-y-2">
+            <label for="status" class="block text-sm font-semibold text-white">Status</label>
+            <div class="relative">
+                <select
+                    id="status"
+                    name="status"
+                    x-model.number="selectedStatus"
+                    class="appearance-none w-full px-5 py-3 rounded-lg border-2 border-gray-500 bg-slate-800 text-gray-100 focus:ring-sky-400 focus:border-sky-400 pr-10 leading-tight"
+                >
+                    @foreach ($status as $key => $label)
+                        <option value="{{ $key }}" {{ $key == $selectedStatus ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <svg class="w-5 h-5 text-gray-300 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="space-y-2 w-1/2">
+            <label for="post_at" class="block text-sm font-semibold text-white">Date</label>
+            <input
+                type="date"
+                id="post_at"
+                name="post_at"
+                x-model="postAt"
+                placeholder=""
+                class="w-full px-4 py-2.5 rounded-lg fill-white border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150"
+            >
+        </div>
+    </div>
+
+    <div class="space-y-2">
+        <label class="block text-sm font-semibold text-white">Image Carousel</label>
+
+        {{-- === AREA PREVIEW UTAMA === --}}
+            <div class="relative w-full aspect-[4/5] bg-slate-800 border-2 border-dashed border-gray-500 rounded-xl overflow-hidden">
+
+                {{-- Gambar utama --}}
+                <template x-if="activePreview">
+                    <img
+                        :src="activePreview"
+                        alt="Preview Utama"
+                        class="absolute inset-0 w-full h-full object-contain transition duration-300"
+                        id="mainImage"
+                    >
+                </template>
+
+                {{-- Jika belum ada gambar --}}
+                <div
+                    x-show="!activePreview"
+                    class="absolute inset-0 flex items-center justify-center text-gray-300 text-sm"
+                >
+                    Belum ada gambar
+                </div>
+
+                {{-- Tombol Navigasi --}}
+                <button
+                    type="button"
+                    @click="prev()"
+                    x-show="previews.length > 1"
+                    id="prev"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 bg-gray-700/70 hover:bg-gray-600 text-white p-2 rounded-full z-20 transition duration-150"
+                >
+                    &#10094;
+                </button>
+
+                <button
+                    type="button"
+                    @click="next()"
+                    x-show="previews.length > 1"
+                    id="next"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-gray-700/70 hover:bg-gray-600 text-white p-2 rounded-full z-20 transition duration-150"
+                >
+                    &#10095;
+                </button>
+
+                {{-- Tombol hapus --}}
+                <button
+                    type="button"
+                    @click="removeImage(current)"
+                    x-show="previews.length > 0"
+                    class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-700 text-white p-1 rounded-full z-20 transition duration-150"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 3a1 1 0 0 0-1 1v1H5v2h14V5h-3V4a1 1 0 0 0-1-1H9zM7 9v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9H7z"/>
+                    </svg>
+                </button>
+
+                {{-- Indikator posisi --}}
+                <div
+                    x-show="previews.length > 0"
+                    class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-xs"
+                >
+                    <span x-text="current + 1"></span>/<span x-text="previews.length"></span>
+                </div>
+            </div>
+
+
+            {{-- === LIST THUMBNAIL === --}}
+            <div class="flex flex-wrap gap-2">
+                <template x-for="(thumb, i) in previews" :key="i">
+                    <img
+                        :src="thumb"
+                        @click="setActive(i)"
+                        :class="{'ring-2 ring-purple-500 border-purple-500': current === i, 'border-gray-600': current !== i}"
+                        class="thumb w-24 h-26 object-cover rounded-lg border-2 cursor-pointer transition duration-150"
+                    >
+                </template>
+
+                {{-- Tombol Upload --}}
+                <label class="flex flex-col items-center justify-center w-24 h-26 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-slate-800 hover:bg-slate-700 transition duration-150">
+                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <input
+                        type="file"
+                        x-ref="fileInput"
+                        class="hidden"
+                        name="media[]"
+                        multiple
+                        accept="image/*"
+                        @change="handleImageUpload($event)"
+                    >
+                </label>
+            </div>
+
+        @error('media.*')
+            <p class="text-sm text-red-500 dark:text-red-400">{{ $message }}</p>
+        @enderror
+    </div>
+
+    {{-- Bagian form lainnya tetap sama --}}
+    <div class="space-y-2">
+        <label for="caption" class="block text-sm font-semibold text-white">Caption</label>
+        <textarea
+            id="caption"
+            name="caption"
+            x-model="caption"
+            rows="8"
+            placeholder="Tulis caption kamu..."
+            class="w-full px-4 py-3 rounded-lg border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150"
+        ></textarea>
+    </div>
+
+    <div class="space-y-3">
+        <h3 class="block text-sm font-semibold text-white">Template Tags</h3>
+        <div class="flex flex-wrap justify-center gap-2 p-2 border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 rounded-lg">
+            <template x-for="(tag, index) in templateTags" :key="index">
+                <span
+                    x-text="tag"
+                    class="px-2.5 py-1.5 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl cursor-default">
+                </span>
+            </template>
+        </div>
+    </div>
+
+    <div class="space-y-3">
+        <h3 class="block text-sm font-semibold text-white">
+            Optional Tags
+            <span class="text-sm italic text-gray-500 dark:text-gray-400">*Max added <span x-text="maxOptionalTags"></span> tags</span>
+        </h3>
+
+        <div class="flex flex-wrap gap-2">
+            <template x-for="(tag, index) in optionalTags" :key="index">
+                <span class="inline-flex items-center px-3 py-1 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl">
+                    <span x-text="tag"></span>
+                    <button
+                        @click="removeOptionalTag(index)"
+                        type="button"
+                        class="ml-1.5 -mr-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-red-400 hover:text-red-300 transition duration-150"
+                    >
+                        <svg class="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
+                            <path stroke-linecap="round" stroke-width="1.5" d="M1 1l6 6m0-6L1 7"></path>
+                        </svg>
+                    </button>
+                    <input type="hidden" name="hashtag[]" :value="tag">
+                </span>
+            </template>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <input
+                type="text"
+                x-model="newOptionalTag"
+                @keydown.enter.prevent="addOptionalTag()"
+                :disabled="optionalTags.length >= maxOptionalTags"
+                placeholder="Tambah tag baru (Tekan Enter)"
+                class="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg bg-slate-800 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 outline-0 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+            <button
+                @click="addOptionalTag()"
+                :disabled="optionalTags.length >= maxOptionalTags"
+                type="button"
+                class="p-2 text-white rounded-full shadow-md bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 disabled:bg-gray-400 dark:disabled:bg-gray-600"
+            >
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                </svg>
+            </button>
+        </div>
+
+        <p x-show="optionalTags.length >= maxOptionalTags" class="text-sm text-red-500 dark:text-red-400">
+            Batas maksimum <span x-text="maxOptionalTags"></span> tag telah tercapai.
+        </p>
+    </div>
+
+    <button
+        type="submit"
+        class="px-5 w-full py-2.5 bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-emerald-700 text-white font-semibold rounded-lg focus:outline-none transition duration-150">
+        Selesai
+    </button>
+</form>
+
+@push("js")
+<script>
+    window.postForm = function() {
+        return {
+            // Inisialisasi dari prop atau nilai default
+            selectedStatus: 1,
+            postAt: '{{ $postAt }}',
+            title: '',
+            caption: '',
+
+            // Variabel untuk file upload
+            files: [],      // Menyimpan objek File asli
+            previews: [],   // Menyimpan URL preview
+            current: 0, // Indeks file yang sedang ditampilkan
+
+            templateTags: ['#jasawesite'],
+            optionalTags: [],
+            maxOptionalTags: 4,
+            newOptionalTag: '',
+
+
+            get allTags() {
+                return [...new Set(this.templateTags.concat(this.optionalTags))];
+            },
+
+            removeOptionalTag(index) {
+                this.optionalTags.splice(index, 1);
+            },
+
+            addOptionalTag() {
+                if (this.newOptionalTag.trim() !== '' && this.optionalTags.length < this.maxOptionalTags) {
+                    let tag = this.newOptionalTag.trim().replace(/[^a-z0-9]/gi, '').toLowerCase();
+                    if(tag === '') {
+                        this.newOptionalTag = '';
+                        return;
+                    }
+                    tag = '#' + tag;
+
+                    if (!this.optionalTags.includes(tag) && !this.templateTags.includes(tag)) {
+                        this.optionalTags.push(tag);
+                        this.newOptionalTag = '';
+                    }
+                }
+            },
+
+            get activePreview() {
+                return this.previews.length > 0 ? this.previews[this.current] : null;
+            },
+
+            handleImageUpload(e) {
+                const newFiles = Array.from(e.target.files);
+                if (!newFiles.length) return;
+
+                const readers = newFiles.map(file => {
+                    this.files.push(file);
+                    return new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = ev => resolve(ev.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                });
+
+                Promise.all(readers).then(results => {
+                    // Masukkan semua hasil sekaligus → 1x trigger reactivity
+                    this.previews.push(...results);
+
+                    if (this.previews.length === results.length) this.current = 0;
+                });
+            },
+
+            setActive(i) {
+                if (this.previews[i]) this.current = i;
+            },
+
+            next() {
+                if (this.previews.length > 0)
+                    this.current = (this.current + 1) % this.previews.length;
+            },
+
+            prev() {
+                if (this.previews.length > 0)
+                    this.current = (this.current - 1 + this.previews.length) % this.previews.length;
+            },
+
+            removeImage(i) {
+                if (i < 0 || i >= this.previews.length) return;
+                this.files.splice(i, 1);
+                this.previews.splice(i, 1);
+                if (this.current >= this.previews.length)
+                    this.current = Math.max(0, this.previews.length - 1);
+            }
+        }
+    }
+</script>
+@endpush

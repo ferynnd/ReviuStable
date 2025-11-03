@@ -1,0 +1,246 @@
+@props(['status' => [],
+        'selectedStatus' => 1,
+        'postAt' => date('Y-m-d')
+])
+
+
+<form
+    action="{{ route('post.store') }}"
+    method="POST"
+    enctype="multipart/form-data"
+    class="space-y-6 w-full"
+    x-data="postForm()"
+    x-init="
+        selectedStatus = {{ $selectedStatus }};
+        postAt = '{{ $postAt }}';
+    "
+>
+    @csrf
+
+    {{-- Hardcode content feed type --}}
+    <input type="hidden" name="content_type" value="3">
+
+        <div class="space-y-4">
+            <div class="flex w-full flex-col lg:flex-row gap-3">
+                <div class="space-y-2 flex-1">
+                    <label for="title" class="block text-sm font-semibold text-white">Title</label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        x-model="title" {{-- FIX: Binding Alpine --}}
+                        placeholder="Judul postingan"
+                        class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150">
+                </div>
+            </div>
+
+            <div class="flex w-full flex-row gap-3">
+                <div class="w-1/2 space-y-2">
+                    <label for="status" class="block text-sm font-semibold text-white">Status</label>
+                    <div class="relative">
+                        <select
+                            id="status"
+                            name="status"
+                            x-model.number="selectedStatus" {{-- FIX: Binding Alpine --}}
+                            class="appearance-none w-full px-5 py-3 rounded-lg border-2 border-gray-500 bg-slate-800 text-gray-100 focus:ring-sky-400 focus:border-sky-400 pr-10 leading-tight"
+                        >
+                            @foreach ($status as $key => $label)
+                                <option value="{{ $key }}" {{ $key == $selectedStatus ? 'selected' : '' }}>{{ $label }}</option> {{-- Menambahkan logika 'selected' dari prop --}}
+                            @endforeach
+                        </select>
+
+                        <svg class="w-5 h-5 text-gray-300 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="space-y-2 w-1/2">
+                    <label for="post_at" class="block text-sm font-semibold text-white">Date</label>
+                    <input
+                        type="date"
+                        id="post_at"
+                        name="post_at"
+                        x-model="postAt" {{-- Sinkronisasi tanggal dengan nilai awal dari prop --}}
+                        placeholder=""
+                        class="w-full px-4 py-2.5 rounded-lg fill-white border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150"
+                    >
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-white">Image Story</label>
+
+                {{-- === AREA PREVIEW UTAMA === --}}
+                    <div class="relative w-full aspect-[9/16] bg-slate-800 border-2 border-dashed border-gray-500 rounded-xl overflow-hidden">
+
+                        {{-- Gambar utama --}}
+                        <template x-if="activePreview">
+                            <img
+                                :src="activePreview"
+                                alt="Preview Utama"
+                                class="absolute inset-0 w-full h-full object-contain transition duration-300"
+                                id="mainImage"
+                            >
+                        </template>
+
+                        {{-- Jika belum ada gambar --}}
+                        <div
+                            x-show="!activePreview"
+                            class="absolute inset-0 flex items-center justify-center text-gray-300 text-sm"
+                        >
+                            Belum ada gambar
+                        </div>
+
+                        {{-- Tombol Navigasi --}}
+                        <button
+                            type="button"
+                            @click="prev()"
+                            x-show="previews.length > 1"
+                            id="prev"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 bg-gray-700/70 hover:bg-gray-600 text-white p-2 rounded-full z-20 transition duration-150"
+                        >
+                            &#10094;
+                        </button>
+
+                        <button
+                            type="button"
+                            @click="next()"
+                            x-show="previews.length > 1"
+                            id="next"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 bg-gray-700/70 hover:bg-gray-600 text-white p-2 rounded-full z-20 transition duration-150"
+                        >
+                            &#10095;
+                        </button>
+
+                        {{-- Tombol hapus --}}
+                        <button
+                            type="button"
+                            @click="removeImage(current)"
+                            x-show="previews.length > 0"
+                            class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-700 text-white p-1 rounded-full z-20 transition duration-150"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 3a1 1 0 0 0-1 1v1H5v2h14V5h-3V4a1 1 0 0 0-1-1H9zM7 9v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9H7z"/>
+                            </svg>
+                        </button>
+
+                        {{-- Indikator posisi --}}
+                        <div
+                            x-show="previews.length > 0"
+                            class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-xs"
+                        >
+                            <span x-text="current + 1"></span>/<span x-text="previews.length"></span>
+                        </div>
+                    </div>
+
+
+                    {{-- === LIST THUMBNAIL === --}}
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="(thumb, i) in previews" :key="i">
+                            <img
+                                :src="thumb"
+                                @click="setActive(i)"
+                                :class="{'ring-2 ring-purple-500 border-purple-500': current === i, 'border-gray-600': current !== i}"
+                                class="thumb w-24 h-32 object-cover rounded-lg border-2 cursor-pointer transition duration-150"
+                            >
+                        </template>
+
+                        {{-- Tombol Upload --}}
+                        <label class="flex flex-col items-center justify-center w-24 h-32 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-slate-800 hover:bg-slate-700 transition duration-150">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <input
+                                type="file"
+                                x-ref="fileInput"
+                                class="hidden"
+                                name="media[]"
+                                multiple
+                                accept="image/*"
+                                @change="handleImageUpload($event)"
+                            >
+                        </label>
+                    </div>
+
+                @error('media.*')
+                    <p class="text-sm text-red-500 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <button
+                type="submit"
+                class="px-5 w-full py-2.5 bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-emerald-700 text-white font-semibold rounded-lg focus:outline-none transition duration-150">
+                Selesai
+            </button>
+
+</form>
+
+
+@push("js")
+    <script>
+        // Dideklarasikan di window agar tersedia secara global
+        window.postForm = function() {
+            return {
+                // Inisialisasi dari prop atau nilai default
+                selectedStatus: 1,
+                postAt: '{{ $postAt }}',
+                title: '',
+
+                // Variabel untuk file upload
+                files: [],
+                previews: [],
+                current: 0,
+
+                get activePreview() {
+                    return this.previews.length > 0 ? this.previews[this.current] : null;
+                },
+
+                handleImageUpload(e) {
+                    const newFiles = Array.from(e.target.files);
+                    if (!newFiles.length) return;
+
+                    const readers = newFiles.map(file => {
+                        this.files.push(file);
+                        return new Promise(resolve => {
+                            const reader = new FileReader();
+                            reader.onload = ev => resolve(ev.target.result);
+                            reader.readAsDataURL(file);
+                        });
+                    });
+
+                    Promise.all(readers).then(results => {
+                        // Masukkan semua hasil sekaligus → 1x trigger reactivity
+                        this.previews.push(...results);
+
+                        if (this.previews.length === results.length) this.current = 0;
+
+                    });
+                },
+
+                setActive(i) {
+                    if (this.previews[i]) this.current = i;
+                },
+
+                next() {
+                    if (this.previews.length > 0)
+                        this.current = (this.current + 1) % this.previews.length;
+                },
+
+                prev() {
+                    if (this.previews.length > 0)
+                        this.current = (this.current - 1 + this.previews.length) % this.previews.length;
+                },
+
+                removeImage(i) {
+                    if (i < 0 || i >= this.previews.length) return;
+                    this.files.splice(i, 1);
+                    this.previews.splice(i, 1);
+                    if (this.current >= this.previews.length)
+                        this.current = Math.max(0, this.previews.length - 1);
+                }
+            }
+        }
+    </script>
+@endpush
