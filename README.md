@@ -33,7 +33,7 @@ Pastikan Anda telah menginstal yang berikut ini di sistem Anda. Versi yang direk
 
 1.  **Clone Repository**
     ```bash
-    git clone [https://github.com/ferynnd/ReviuStable.git](https://github.com/ferynnd/ReviuStable.git)
+    git clone https://github.com/ferynnd/ReviuStable.git
     ```
 
 2.  **Masuk ke Directory Proyek**
@@ -89,7 +89,6 @@ Pastikan Anda telah menginstal yang berikut ini di sistem Anda. Versi yang direk
     Kompilasi atau transpilasi aset CSS dan JavaScript:
     ```bash
     npm run dev
-    # Atau gunakan 'npm run watch' untuk pengembangan
     ```
 
 12. **Jalankan Server Lokal**
