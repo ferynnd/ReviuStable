@@ -8,7 +8,7 @@ use App\Http\Controllers\{
     HomeController,
     CalendarController,
     UserController,
-    ProfileController
+    ProfileController,
 };
 
 Route::get("/", function () {
@@ -19,10 +19,10 @@ Route::get("/login", [AuthController::class, "showLoginForm"])->name("login");
 Route::post("/login", [AuthController::class, "login"])->name("login.submit");
 
 Route::get("/forgot-password", [AuthController::class, "showForgot"])->name(
-    "password.request"
+    "password.request",
 );
 Route::post("/forgot-password", [AuthController::class, "storeForgot"])->name(
-    "password.email"
+    "password.email",
 );
 
 Route::get("/reset-password/{token}", [
@@ -30,17 +30,17 @@ Route::get("/reset-password/{token}", [
     "showReset",
 ])->name("password.reset");
 Route::post("/reset-password", [AuthController::class, "storeReset"])->name(
-    "password.update"
+    "password.update",
 );
 
 Route::middleware("auth")->group(function () {
     Route::get("/home", [HomeController::class, "index"])->name("home");
 
     Route::get("/calendar", [CalendarController::class, "index"])->name(
-        "calendar.page"
+        "calendar.page",
     );
     Route::get("/calendar/list", [CalendarController::class, "list"])->name(
-        "calendar.list"
+        "calendar.list",
     );
 
     Route::resource("tags", HashtagController::class)->only([
@@ -51,13 +51,13 @@ Route::middleware("auth")->group(function () {
 
     Route::prefix("post")->group(function () {
         Route::get("/create", [PostController::class, "index"])->name(
-            "post.index"
+            "post.index",
         );
         Route::post("/create", [PostController::class, "store"])->name(
-            "post.store"
+            "post.store",
         );
         Route::get("/detail/{slug}", [PostController::class, "detail"])->name(
-            "post.detail"
+            "post.detail",
         );
         Route::post("/detail/{post}/like", [
             PostController::class,
@@ -76,18 +76,18 @@ Route::middleware("auth")->group(function () {
             "initialStatus",
         ])->name("status");
         Route::post("/{slug}/share", [PostController::class, "share"])->name(
-            "post.share"
+            "post.share",
         );
         // Halaman edit post
         Route::get("{slug}/edit", [PostController::class, "edit"])->name(
-            "post.edit"
+            "post.edit",
         );
         // Update post (via PUT/PATCH)
         Route::put("{slug}", [PostController::class, "update"])->name(
-            "post.update"
+            "post.update",
         );
         Route::delete("{slug}", [PostController::class, "destroy"])->name(
-            "post.delete"
+            "post.delete",
         );
         // Route untuk membuat revisi dari post lama
         Route::get("/{slug}/revision", [
@@ -105,17 +105,17 @@ Route::middleware("auth")->group(function () {
         ->group(function () {
             Route::get("/", [UserController::class, "index"])->name("index");
             Route::get("/create", [UserController::class, "create"])->name(
-                "create"
+                "create",
             );
             Route::post("/", [UserController::class, "store"])->name("store");
             Route::get("/{user}/edit", [UserController::class, "edit"])->name(
-                "edit"
+                "edit",
             );
             Route::put("/{user}", [UserController::class, "update"])->name(
-                "update"
+                "update",
             );
             Route::delete("/{user}", [UserController::class, "destroy"])->name(
-                "destroy"
+                "destroy",
             );
         });
 
@@ -123,20 +123,23 @@ Route::middleware("auth")->group(function () {
         ->name("profile.")
         ->group(function () {
             Route::get("/edit", [ProfileController::class, "edit"])->name(
-                "edit"
+                "edit",
             );
             Route::get("/{username}", [
                 ProfileController::class,
                 "index",
             ])->name("page");
             Route::put("/", [ProfileController::class, "update"])->name(
-                "update"
+                "update",
             );
+            Route::post("/change-password", [
+                ProfileController::class,
+                "changePassword",
+            ])->name("change-password");
+            Route::get("/{username}/drafts/{type}", [
+                ProfileController::class,
+                "draftList",
+            ])->name("drafts");
         });
-
-    Route::post("/change-password", [
-        ProfileController::class,
-        "changePassword",
-    ])->name("profile.change-password");
     Route::post("/logout", [AuthController::class, "logout"])->name("logout");
 });

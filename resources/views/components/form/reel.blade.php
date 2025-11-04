@@ -1,7 +1,8 @@
 @props([
     'status' => [],
     'selectedStatus' => 1,
-    'postAt' => date('Y-m-d')
+    'postAt' => date('Y-m-d'),
+    'tags' => []
 ])
 
 <form
@@ -140,14 +141,17 @@
     </div>
 
     <div class="space-y-3">
+        @php
+            $tag = $tags->pluck('name');
+        @endphp
         <h3 class="block text-sm font-semibold text-white">Template Tags</h3>
-        <div class="flex flex-wrap justify-center gap-2 p-2 border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 rounded-lg">
+        <div x-data="{templateTags: @js($tag) }" class="flex flex-wrap justify-center gap-2 p-2 border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 rounded-lg">
             <template x-for="(tag, index) in templateTags" :key="index">
                 <span
-                x-text="tag"
-                class="px-2.5 py-1.5 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl">
-            </span>
-        </template>
+                    x-text="tag"
+                    class="px-2.5 py-1.5 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl">
+                </span>
+            </template>
         </div>
     </div>
 
@@ -216,23 +220,20 @@
         // Dideklarasikan di window agar tersedia secara global
         window.postForm = function() {
             return {
-                // Inisialisasi dari prop atau nilai default
                 selectedStatus: 1,
                 postAt: '{{ $postAt }}',
                 title: '',
                 caption: '',
 
-                // Variabel untuk file upload
                 files: [],
                 previews: [],
 
-                templateTags: ['#jasawesite'],
                 optionalTags: [],
                 maxOptionalTags: 4,
                 newOptionalTag: '',
 
                 get allTags() {
-                    return [...new Set(this.templateTags.concat(this.optionalTags))];
+                    return [...new Set(this.optionalTags)];
                 },
 
                 removeOptionalTag(index) {
@@ -248,7 +249,7 @@
                         }
                         tag = '#' + tag;
 
-                        if (!this.optionalTags.includes(tag) && !this.templateTags.includes(tag)) {
+                        if (!this.optionalTags.includes(tag)) {
                             this.optionalTags.push(tag);
                             this.newOptionalTag = '';
                         }

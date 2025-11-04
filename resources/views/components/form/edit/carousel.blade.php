@@ -2,7 +2,8 @@
     'oldpost',
     'status' => [],
     'selectedStatus' => 1,
-    'postAt' => date('Y-m-d')
+    'postAt' => date('Y-m-d'),
+    'tags' => []
 ])
 
 <form
@@ -74,7 +75,7 @@
     </div>
 
     <div class="space-y-2">
-        <label class="block text-sm font-semibold text-white">Image Carousel 
+        <label class="block text-sm font-semibold text-white">Image Carousel
             <span class="text-xs text-gray-400 mt-1 italic">
                 *Gambar lama akan tetap digunakan jika tidak mengganti file baru.
             </span>
@@ -93,7 +94,6 @@
                     >
                 </template>
 
-                {{-- Jika belum ada gambar --}}
                 <div
                     x-show="!activePreview"
                     class="absolute inset-0 flex items-center justify-center text-gray-300 text-sm"
@@ -101,7 +101,6 @@
                     Belum ada gambar
                 </div>
 
-                {{-- Tombol Navigasi --}}
                 <button
                     type="button"
                     @click="prev()"
@@ -122,7 +121,6 @@
                     &#10095;
                 </button>
 
-                {{-- Tombol hapus --}}
                 <button
                     type="button"
                     @click="removeImage(current)"
@@ -134,7 +132,6 @@
                     </svg>
                 </button>
 
-                {{-- Indikator posisi --}}
                 <div
                     x-show="previews.length > 0"
                     class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-xs"
@@ -144,7 +141,6 @@
             </div>
 
 
-            {{-- === LIST THUMBNAIL === --}}
             <div class="flex flex-wrap gap-2">
                 <template x-for="(thumb, i) in previews" :key="i">
                     <img
@@ -160,7 +156,6 @@
                 </template>
 
 
-                {{-- Tombol Upload --}}
                 <label class="flex flex-col items-center justify-center w-24 h-26 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-slate-800 hover:bg-slate-700 transition duration-150">
                     <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
@@ -182,7 +177,6 @@
         @enderror
     </div>
 
-    {{-- Bagian form lainnya tetap sama --}}
     <div class="space-y-2">
         <label for="caption" class="block text-sm font-semibold text-white">Caption</label>
         <textarea
@@ -196,12 +190,16 @@
     </div>
 
     <div class="space-y-3">
+        @php
+            $tag = $tags->pluck('name');
+        @endphp
+
         <h3 class="block text-sm font-semibold text-white">Template Tags</h3>
-        <div class="flex flex-wrap justify-center gap-2 p-2 border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 rounded-lg">
+        <div x-data="{templateTags: @js($tag) }" class="flex flex-wrap justify-center gap-2 p-2 border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 rounded-lg">
             <template x-for="(tag, index) in templateTags" :key="index">
                 <span
                     x-text="tag"
-                    class="px-2.5 py-1.5 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl cursor-default">
+                    class="px-2.5 py-1.5 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl">
                 </span>
             </template>
         </div>
@@ -281,12 +279,12 @@
             previews: initial.oldPreviews ? [...initial.oldPreviews] : [], // campuran lama + baru
             current: 0, // Indeks file yang sedang ditampilkan
 
-            templateTags: ['#jasawesite'],
+            // templateTags: ['#jasawesite'],
             maxOptionalTags: 4,
             newOptionalTag: '',
 
             get allTags() {
-                return [...new Set(this.templateTags.concat(this.optionalTags))];
+                return [...new Set(this.optionalTags)];
             },
 
             removeOptionalTag(index) {
@@ -302,7 +300,7 @@
                     }
                     tag = '#' + tag;
 
-                    if (!this.optionalTags.includes(tag) && !this.templateTags.includes(tag)) {
+                    if (!this.optionalTags.includes(tag)) {
                         this.optionalTags.push(tag);
                         this.newOptionalTag = '';
                     }

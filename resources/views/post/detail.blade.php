@@ -21,7 +21,7 @@
                 _likeLock: false,
                 _commentLock: false,
                 shareUrl: '',
-                showShareModal: false, 
+                showShareModal: false,
                 userLiked : [],
                 showLikesModal: false,
 
@@ -55,7 +55,6 @@
 
                 async toggleLike() {
 
-                    // PERBAIKAN: Gunakan timestamp untuk debounce
                     const now = Date.now();
                     if (this._lastLikeClick && (now - this._lastLikeClick) < 1000) {
                         return;
@@ -63,7 +62,6 @@
                     this._lastLikeClick = now;
 
 
-                    // PERBAIKAN: Tambahkan guard clause yang lebih strict
                     if (this.isInteracting) {
                         return;
                     }
@@ -71,7 +69,6 @@
                     this.isInteracting = true;
 
                     try {
-                        // Optimistic update
                         const wasLiked = this.liked;
                         this.liked = !this.liked;
                         this.likeCount += this.liked ? 1 : -1;
@@ -105,8 +102,8 @@
                                 position: 'top-end',
                                 icon: 'success',
                                 title: 'Berhasil disukai!',
-                                showConfirmButton: false, // Tidak perlu tombol OK
-                                timer: 2000, // Hilang setelah 2 detik
+                                showConfirmButton: false,
+                                timer: 2000,
                                 timerProgressBar: true
                             });
                         }
@@ -122,7 +119,6 @@
                             timerProgressBar: true
                         });
                     } finally {
-                        // PERBAIKAN: Beri delay kecil sebelum reset interacting state
                         setTimeout(() => {
                             this.isInteracting = false;
                         }, 100);
@@ -157,14 +153,13 @@
                     this._lastLikeClick = now;
 
 
-                    // PERBAIKAN: Tambahkan validasi yang lebih strict
                     if (this.newComment.trim() === '' || this.isInteracting) {
                         return;
                     }
 
                     this.isInteracting = true;
                     const commentText = this.newComment.trim();
-                    this.newComment = 'Mengirim...'; // Clear immediately
+                    this.newComment = 'Mengirim...';
 
                     try {
                         let response = await fetch(`/post/detail/${slug}/comment`, {
@@ -194,17 +189,16 @@
                             position: 'top-end',
                             icon: 'success',
                             title: 'Berhasil Mengirim Komentar!',
-                            showConfirmButton: false, // Tidak perlu tombol OK
-                            timer: 2000, // Hilang setelah 2 detik
+                            showConfirmButton: false,
+                            timer: 2000,
                             timerProgressBar: true
                         });
 
 
 
                     } catch (error) {
-                        this.newComment = commentText; // Kembalikan teks jika error
+                        this.newComment = commentText;
                     } finally {
-                        // PERBAIKAN: Beri delay kecil sebelum reset interacting state
                         setTimeout(() => {
                             this.isInteracting = false;
                             console.log('✅ Comment interaction completed');
@@ -232,7 +226,7 @@
                         year: 'numeric'
                     });
                 },
-                        
+
                 async shareContent() {
                     // Jika browser support native share
                     if (navigator.share) {
@@ -246,13 +240,11 @@
                             // User cancelled share, no action needed
                         }
                     } else {
-                        // Fallback: buka modal share
                         this.openShareModal();
                     }
                 },
 
                 async openShareModal() {
-                    // Generate share URL
                     try {
                         let response = await fetch(`/post/${slug}/share`, {
                             method: 'POST',
@@ -272,7 +264,7 @@
                     } catch (error) {
                         this.shareUrl = window.location.href;
                     }
-                    this.showShareModal = true; // ✅ PASTIKAN INI DIPANGGIL
+                    this.showShareModal = true;
                 },
 
                 shareToPlatform(platform) {
@@ -299,8 +291,8 @@
                                 position: 'top-end',
                                 icon: 'success',
                                 title: 'Link berhasil disalin!',
-                                showConfirmButton: false, // Tidak perlu tombol OK
-                                timer: 2000, // Hilang setelah 2 detik
+                                showConfirmButton: false,
+                                timer: 2000,
                                 timerProgressBar: true
                             });
                     } catch (err) {
@@ -312,108 +304,103 @@
                         document.execCommand('copy');
                         document.body.removeChild(textArea);
                     }
-                    this.showShareModal = false; // ✅ TUTUP MODAL SETELAH COPY
+                    this.showShareModal = false;
                 },
 
             }
         }
 
         function postCarousel(mediaUrls) {
-    return {
-        mediaUrls: mediaUrls.filter(url => url),
-        currentSlide: 0,
-        isDragging: false,
-        startX: 0,
-        currentTranslate: 0,
-        prevTranslate: 0,
+            return {
+                mediaUrls: mediaUrls.filter(url => url),
+                currentSlide: 0,
+                isDragging: false,
+                startX: 0,
+                currentTranslate: 0,
+                prevTranslate: 0,
 
-        // 🔥 variabel untuk lightbox
-        isLightboxOpen: false,
-        lightboxUrl: null,
-        lightboxType: null,
+                isLightboxOpen: false,
+                lightboxUrl: null,
+                lightboxType: null,
 
-        init() {
-            if (this.mediaUrls.length === 0) {
-                this.mediaUrls = [null];
+                init() {
+                    if (this.mediaUrls.length === 0) {
+                        this.mediaUrls = [null];
+                    }
+                    this.$watch('currentSlide', () => this.setSliderPosition(true));
+                    this.setSliderPosition(false);
+                    window.addEventListener('keydown', e => this.handleKeydown(e));
+                },
+
+                openLightbox(url, type = 'image') {
+                    this.lightboxUrl = url;
+                    this.lightboxType = type;
+                    this.isLightboxOpen = true;
+                    document.body.style.overflow = 'hidden'; // disable scroll
+                },
+
+                closeLightbox() {
+                    this.isLightboxOpen = false;
+                    this.lightboxUrl = null;
+                    this.lightboxType = null;
+                    document.body.style.overflow = '';
+                },
+
+                handleKeydown(event) {
+                    if (event.key === 'Escape' && this.isLightboxOpen) {
+                        this.closeLightbox();
+                    }
+                },
+
+                setSliderPosition(animated = true) {
+                    const slider = this.$refs.slider;
+                    if (!slider) return;
+
+                    slider.style.transition = animated ? 'transform 0.3s ease-out' : 'none';
+                    const percentTranslate = this.currentSlide * -100;
+                    slider.style.transform = `translateX(${percentTranslate}%)`;
+                    this.currentTranslate = percentTranslate * (slider.offsetWidth / 100);
+                    this.prevTranslate = this.currentTranslate;
+                },
+
+                startDrag(event) {
+                    if (this.mediaUrls.length <= 1) return;
+                    this.isDragging = true;
+                    this.startX = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+                    this.$refs.slider.style.transition = 'none';
+                },
+
+                drag(event) {
+                    if (!this.isDragging) return;
+                    const currentX = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+                    const diff = currentX - this.startX;
+                    this.$refs.slider.style.transform = `translateX(${this.prevTranslate + diff}px)`;
+                },
+
+                endDrag(event) {
+                    if (!this.isDragging) return;
+                    this.isDragging = false;
+                    const slider = this.$refs.slider;
+                    const currentX = event.type.includes('mouse') ? event.pageX : event.changedTouches[0].clientX;
+                    const movedBy = currentX - this.startX;
+                    const threshold = slider.offsetWidth / 4;
+
+                    if (movedBy < -threshold && this.currentSlide < this.mediaUrls.length - 1) {
+                        this.currentSlide++;
+                    } else if (movedBy > threshold && this.currentSlide > 0) {
+                        this.currentSlide--;
+                    }
+
+                    this.setSliderPosition();
+                },
+
+                handleResize() {
+                    this.setSliderPosition(false);
+                },
             }
-            this.$watch('currentSlide', () => this.setSliderPosition(true));
-            this.setSliderPosition(false);
-            window.addEventListener('keydown', e => this.handleKeydown(e));
-        },
+        }
 
-        // 🔥 Buka lightbox saat klik gambar/video
-        openLightbox(url, type = 'image') {
-            this.lightboxUrl = url;
-            this.lightboxType = type;
-            this.isLightboxOpen = true;
-            document.body.style.overflow = 'hidden'; // disable scroll
-        },
 
-        // 🔥 Tutup lightbox
-        closeLightbox() {
-            this.isLightboxOpen = false;
-            this.lightboxUrl = null;
-            this.lightboxType = null;
-            document.body.style.overflow = '';
-        },
-
-        // Tutup jika tekan ESC
-        handleKeydown(event) {
-            if (event.key === 'Escape' && this.isLightboxOpen) {
-                this.closeLightbox();
-            }
-        },
-
-        // --- Carousel logic ---
-        setSliderPosition(animated = true) {
-            const slider = this.$refs.slider;
-            if (!slider) return;
-
-            slider.style.transition = animated ? 'transform 0.3s ease-out' : 'none';
-            const percentTranslate = this.currentSlide * -100;
-            slider.style.transform = `translateX(${percentTranslate}%)`;
-            this.currentTranslate = percentTranslate * (slider.offsetWidth / 100);
-            this.prevTranslate = this.currentTranslate;
-        },
-
-        startDrag(event) {
-            if (this.mediaUrls.length <= 1) return;
-            this.isDragging = true;
-            this.startX = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-            this.$refs.slider.style.transition = 'none';
-        },
-
-        drag(event) {
-            if (!this.isDragging) return;
-            const currentX = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-            const diff = currentX - this.startX;
-            this.$refs.slider.style.transform = `translateX(${this.prevTranslate + diff}px)`;
-        },
-
-        endDrag(event) {
-            if (!this.isDragging) return;
-            this.isDragging = false;
-            const slider = this.$refs.slider;
-            const currentX = event.type.includes('mouse') ? event.pageX : event.changedTouches[0].clientX;
-            const movedBy = currentX - this.startX;
-            const threshold = slider.offsetWidth / 4;
-
-            if (movedBy < -threshold && this.currentSlide < this.mediaUrls.length - 1) {
-                this.currentSlide++;
-            } else if (movedBy > threshold && this.currentSlide > 0) {
-                this.currentSlide--;
-            }
-
-            this.setSliderPosition();
-        },
-
-        handleResize() {
-            this.setSliderPosition(false);
-        },
-    }
-}
-
-        
         </script>
     @endpush
 
@@ -466,13 +453,11 @@
                 <div class="p-4 flex justify-between items-start">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center text-white">
-                             <img 
-                            x-bind:src="user.image 
-                                ? '{{ asset('storage') }}/' + user.image 
-                                : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'"
-                            class="size-10 rounded-full bg-slate-800"
-                            alt=""
-                        >
+                            <img
+                                src="{{ $post->user->image ? asset('storage/' . $post->user->image) : 'https://ui-avatars.com/api/?name='.urlencode($post->user->fullname).'&background=0D8ABC&color=fff' }}"
+                                class="w-full h-full rounded-full object-cover border-2 border-slate-700 shadow mx-auto sm:mx-0"
+                                alt="{{ $post->user->fullname }}"
+                            >
                         </div>
                         <div>
                             <span class="text-white font-semibold">{{ $username }}</span>
@@ -485,54 +470,56 @@
                     </div>
 
                     <div x-data="{ open: false }" @click.outside="open = false" class="relative">
-                        <button @click="open = !open" class="text-gray-400 hover:text-white focus:outline-none p-1 rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                        </button>
+                        @if (Auth::id() === $post->user_id)
+                            <button @click="open = !open" class="text-gray-400 hover:text-white focus:outline-none p-1 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                            </button>
 
-                        <div x-show="open" x-transition class="absolute right-0 mt-2 w-40 rounded-lg shadow-2xl bg-gray-700 ring-1 ring-gray-600 z-60">
-                            @role(['staff', 'superadmin'])
-                            <form 
-                                action="{{ route('post.delete', $post->slug) }}" 
-                                x-ref="deleteForm"
-                                @submit.prevent method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" 
-                                        class="flex items-center px-4 py-2 text-sm text-red-400 hover:bg-gray-600 rounded-t-lg w-full text-left"
-                                        @click="
-                                            Swal.fire({
-                                                title: 'Anda yakin?',
-                                                text: 'Apakah anda yakin ingin menghapus postingan ini?',
-                                                icon: 'warning',
-                                                showCancelButton: true,
-                                                confirmButtonColor: '#3B82F6',
-                                                cancelButtonColor: '#EF4444',
-                                                confirmButtonText: 'Ya, Hapus!',
-                                                cancelButtonText: 'Batal'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    $refs.deleteForm.submit();
-                                                }
-                                            })
-                                        ">
-                                    Hapus
-                                </button>
-                            </form>  
-                            <a href="{{ route('post.edit', $post->slug) }}" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600">Edit</a>
-                            @endrole
-                            @role('staff')
-                            <a href="{{ route('post.revision', $post->slug) }}"
-                                class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 rounded-b-lg">
-                                Revisi
-                            </a>
-                            @endrole
-                        </div>
+                            <div x-show="open" x-transition class="absolute right-0 mt-2 w-40 rounded-lg shadow-2xl bg-gray-700 ring-1 ring-gray-600 z-60">
+                                @role(['staff', 'superadmin'])
+                                <form
+                                    action="{{ route('post.delete', $post->slug) }}"
+                                    x-ref="deleteForm"
+                                    @submit.prevent method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button"
+                                            class="flex items-center px-4 py-2 text-sm text-red-400 hover:bg-gray-600 rounded-t-lg w-full text-left"
+                                            @click="
+                                                Swal.fire({
+                                                    title: 'Anda yakin?',
+                                                    text: 'Apakah anda yakin ingin menghapus postingan ini?',
+                                                    icon: 'warning',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#3B82F6',
+                                                    cancelButtonColor: '#EF4444',
+                                                    confirmButtonText: 'Ya, Hapus!',
+                                                    cancelButtonText: 'Batal'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        $refs.deleteForm.submit();
+                                                    }
+                                                })
+                                            ">
+                                        Hapus
+                                    </button>
+                                </form>
+                                    <a href="{{ route('post.edit', $post->slug) }}" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600">Edit</a>
+                                @endrole
+                                @role('staff')
+                                    <a href="{{ route('post.revision', $post->slug) }}"
+                                        class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 rounded-b-lg">
+                                        Revisi
+                                    </a>
+                                @endrole
+                            </div>
+                        @endif
                     </div>
                 </div>
 
                 <!-- Media Content -->
-                
-                <div 
+
+                <div
                     x-data="postCarousel({{ json_encode($media_urls) }})"
                     x-init="init"
                     @resize.window="handleResize()"
@@ -555,17 +542,17 @@
                             <div class="flex-none w-full h-full flex items-center justify-center">
                                 @if ($url)
                                     @if (Str::endsWith($url, ['.mp4', '.mov', '.webm']))
-                                        <video 
-                                            @click="openLightbox('{{ $url }}', 'video')" 
-                                            src="{{ $url }}" 
+                                        <video
+                                            @click="openLightbox('{{ $url }}', 'video')"
+                                            src="{{ $url }}"
                                             controls
                                             class="w-full h-full object-cover"
                                         ></video>
                                     @else
-                                        <img 
-                                            @click="openLightbox('{{ $url }}', 'image')" 
-                                            src="{{ $url }}" 
-                                            alt="Slide {{ $loop->iteration }}" 
+                                        <img
+                                            @click="openLightbox('{{ $url }}', 'image')"
+                                            src="{{ $url }}"
+                                            alt="Slide {{ $loop->iteration }}"
                                             class="w-full h-full object-cover"
                                         >
                                     @endif
@@ -580,7 +567,7 @@
                         </div>
                     </template>
 
-                    <div 
+                    <div
                         x-show="isLightboxOpen"
                         x-transition.opacity
                         @click.self="closeLightbox"
@@ -628,7 +615,7 @@
                         </svg>
                     </button>
 
-                    
+
                     <!-- Share Modal -->
                     <template x-teleport="body">
                         <div x-show="showShareModal"
@@ -688,8 +675,8 @@
                             <!-- User pertama -->
                             <template x-if="userLiked[0]">
                                 <div class="flex items-center gap-1">
-                                    <img 
-                                        x-bind:src="userLiked[0].image 
+                                    <img
+                                        x-bind:src="userLiked[0].image
                                             ? '{{ asset('storage') }}/' + userLiked[0].image
                                             : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'"
                                         class="size-5 rounded-full bg-slate-800 object-cover"
@@ -711,9 +698,9 @@
                     <p x-show="userLiked.length === 0" class="text-gray-400 italic">Belum ada yang menyukai.</p>
                 </div>
 
-                
+
                 <!-- Modal Daftar Like -->
-                <div 
+                <div
                     x-show="showLikesModal"
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0"
@@ -739,11 +726,11 @@
                         <div class="flex flex-col p-4 gap-3 max-h-96 overflow-y-auto">
                             <template x-for="user in userLiked" :key="user.id">
                                 <div class="flex items-center gap-3">
-                                    <img 
-                                        x-bind:src="user.image 
-                                            ? '{{ asset('storage') }}/' + user.image 
+                                    <img
+                                        x-bind:src="user.image
+                                            ? '{{ asset('storage') }}/' + user.image
                                             : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'"
-                                        class="size-10 rounded-full bg-slate-800"
+                                        class="size-10 rounded-full object-cover bg-slate-800"
                                         alt=""
                                     >
                                     <span class="text-white font-medium" x-text="user.username || user.fullname"></span>
@@ -769,7 +756,7 @@
                     <ul class="mt-2 text-sm">
                         @foreach ($revisions as $rev)
                             <li class="text-gray-300">
-                                <a 
+                                <a
                                     href="{{ route('post.detail', $post->status === 'revision' ? $rev->newPost->slug : $rev->post->slug) }}"
                                     class="text-gray-300 hover:text-sky-400 transition-colors duration-150"
                                 >
@@ -837,7 +824,6 @@
             </div>
 
             @role('superadmin')
-            {{-- Form Komentar --}}
             <div class="space-y-4">
                 <div class="px-4 flex flex-col gap-2">
                     <div x-ref="commentForm" class="mt-6 flex gap-3">

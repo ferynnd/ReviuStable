@@ -1,4 +1,4 @@
-@props(['postType' => [], 'status' => [], 'type' => '', 'post'])
+@props(['postType' => [], 'status' => [], 'type' => '', 'post', 'tags' => []])
 
 @php
     // Mapping angka ke string type
@@ -47,14 +47,12 @@
     @endphp
 
     @if($currentType === 'feed')
-        <x-form.edit.feed :oldpost="$post" :status="$status" />
+        <x-form.edit.feed :oldpost="$post" :status="$status" :tags="$tags" />
     @elseif($currentType === 'carousel')
-        <x-form.edit.carousel :oldpost="$post" :status="$status" />
+        <x-form.edit.carousel :oldpost="$post" :status="$status" :tags="$tags"  />
     @elseif($currentType === 'story')
-        <x-form.edit.story :oldpost="$post" :status="$status" />
+        <x-form.edit.story :oldpost="$post" :status="$status" :tags="$tags"  />
     @elseif($currentType === 'reel')
-        <x-form.edit.reel :oldpost="$post" :status="$status" />
+        <x-form.edit.reel :oldpost="$post" :status="$status" :tags="$tags"  />
     @endif
 </div>
-
-

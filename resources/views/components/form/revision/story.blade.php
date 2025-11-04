@@ -2,7 +2,8 @@
     'status' => [],
     'selectedStatus' => 1,
     'oldPost',
-    'postAt' => date('Y-m-d')
+    'postAt' => date('Y-m-d'),
+    'tags' => []
 ])
 
 <form
@@ -19,7 +20,6 @@
 >
     @csrf
 
-    {{-- Hardcode content feed type --}}
     <input type="hidden" name="content_type" value="3">
 
         <div class="space-y-4">
@@ -30,7 +30,7 @@
                         type="text"
                         id="title"
                         name="title"
-                        x-model="title" {{-- FIX: Binding Alpine --}}
+                        x-model="title"
                         placeholder="Judul postingan"
                         class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150">
                 </div>
@@ -43,7 +43,7 @@
                         <select
                             id="status"
                             name="status"
-                            x-model.number="selectedStatus" {{-- FIX: Binding Alpine --}}
+                            x-model.number="selectedStatus"
                             class="appearance-none w-full px-5 py-3 rounded-lg border-2 border-gray-500 bg-slate-800 text-gray-100 focus:ring-sky-400 focus:border-sky-400 pr-10 leading-tight"
                         >
                             @foreach ($status as $key => $label)
@@ -64,7 +64,7 @@
                         type="date"
                         id="post_at"
                         name="post_at"
-                        x-model="postAt" {{-- Sinkronisasi tanggal dengan nilai awal dari prop --}}
+                        x-model="postAt"
                         placeholder=""
                         class="w-full px-4 py-2.5 rounded-lg fill-white border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150"
                     >
@@ -74,10 +74,8 @@
             <div class="space-y-2">
                 <label class="block text-sm font-semibold text-white">Image Story</label>
 
-                {{-- === AREA PREVIEW UTAMA === --}}
                     <div class="relative w-full aspect-[9/16] bg-slate-800 border-2 border-dashed border-gray-500 rounded-xl overflow-hidden">
 
-                        {{-- Gambar utama --}}
                         <template x-if="activePreview">
                             <img
                                 :src="activePreview"
@@ -87,7 +85,6 @@
                             >
                         </template>
 
-                        {{-- Jika belum ada gambar --}}
                         <div
                             x-show="!activePreview"
                             class="absolute inset-0 flex items-center justify-center text-gray-300 text-sm"
@@ -95,7 +92,6 @@
                             Belum ada gambar
                         </div>
 
-                        {{-- Tombol Navigasi --}}
                         <button
                             type="button"
                             @click="prev()"
@@ -116,7 +112,6 @@
                             &#10095;
                         </button>
 
-                        {{-- Tombol hapus --}}
                         <button
                             type="button"
                             @click="removeImage(current)"
@@ -128,7 +123,6 @@
                             </svg>
                         </button>
 
-                        {{-- Indikator posisi --}}
                         <div
                             x-show="previews.length > 0"
                             class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-xs"
@@ -138,7 +132,6 @@
                     </div>
 
 
-                    {{-- === LIST THUMBNAIL === --}}
                     <div class="flex flex-wrap gap-2">
                         <template x-for="(thumb, i) in previews" :key="i">
                             <img
@@ -149,7 +142,6 @@
                             >
                         </template>
 
-                        {{-- Tombol Upload --}}
                         <label class="flex flex-col items-center justify-center w-24 h-32 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-slate-800 hover:bg-slate-700 transition duration-150">
                             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>

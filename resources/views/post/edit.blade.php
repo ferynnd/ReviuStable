@@ -10,12 +10,11 @@
             <div class="text-lg font-semibold text-cyan-400">Edit Content</div>
         </header>
 
-         <main class="py-8 px-4 sm:px-4 mx-auto max-w-md">
-             <x-post-edit :post-type="$postType" :status="$status" :type="$type" :post="$post"/>
+         <main class="py-8 px-4 sm:px-4 mx-auto max-w-md mb-14">
+             <x-post-edit :post-type="$postType" :status="$status" :type="$type" :post="$post" :tags="$tags"/>
         </main>
 
 
     </div>
 
 </x-layouts.main>
-

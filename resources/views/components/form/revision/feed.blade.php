@@ -2,7 +2,8 @@
     'status' => [],
     'selectedStatus' => 1,
     'oldPost',
-    'postAt' => date('Y-m-d')
+    'postAt' => date('Y-m-d'),
+    'tags' => []
 ])
 
 <form
@@ -126,7 +127,7 @@
         <textarea
             id="caption"
             name="caption"
-            x-model="caption" {{-- Sinkronisasi caption --}}
+            x-model="caption"
             rows="8"
             placeholder="Tulis caption kamu..."
             class="w-full px-4 py-3 rounded-lg border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150"
@@ -134,8 +135,12 @@
     </div>
 
     <div class="space-y-3">
+        @php
+            $tag = $tags->pluck('name');
+        @endphp
+
         <h3 class="block text-sm font-semibold text-white">Template Tags</h3>
-        <div class="flex flex-wrap justify-center gap-2 p-2 border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 rounded-lg">
+        <div x-data="{templateTags: @js($tag) }" class="flex flex-wrap justify-center gap-2 p-2 border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 rounded-lg">
             <template x-for="(tag, index) in templateTags" :key="index">
                 <span
                     x-text="tag"
@@ -196,14 +201,14 @@
     </div>
 
 
-    <div class="space-y-2"> 
-        <label for="revision_comment" class="block text-sm font-semibold text-white">Komentar Revisi</label> 
-        <textarea id="revision_comment" name="revision_comment" 
-            x-model="revisionComment" rows="4" placeholder="Tambahkan catatan untuk revisi..." 
+    <div class="space-y-2">
+        <label for="revision_comment" class="block text-sm font-semibold text-white">Komentar Revisi</label>
+        <textarea id="revision_comment" name="revision_comment"
+            x-model="revisionComment" rows="4" placeholder="Tambahkan catatan untuk revisi..."
             class="w-full px-4 py-3 rounded-lg border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150" >
-        </textarea> 
+        </textarea>
     </div>
-    
+
 
     <button
         type="submit"
@@ -226,7 +231,6 @@
                 files: [],
                 previews: [],
 
-                templateTags: ['#jasawesite'],
                 optionalTags: [],
                 maxOptionalTags: 4,
                 newOptionalTag: '',
@@ -235,7 +239,7 @@
 
                 // Gabungkan templateTags dan optionalTags
                 get allTags() {
-                    return [...new Set(this.templateTags.concat(this.optionalTags))];
+                    return [...new Set(this.optionalTags)];
                 },
 
                 removeOptionalTag(index) {
@@ -254,7 +258,7 @@
                         }
                         tag = '#' + tag;
 
-                        if (!this.optionalTags.includes(tag) && !this.templateTags.includes(tag)) {
+                        if (!this.optionalTags.includes(tag)) {
                             this.optionalTags.push(tag);
                             this.newOptionalTag = '';
                         }

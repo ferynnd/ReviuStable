@@ -91,69 +91,74 @@ class PostController extends Controller
 
         $post->attachMedia($request);
 
-        return redirect()->route("home")->with('success', 'Post berhasil 😊');
+        return redirect()->route("home")->with("success", "Post berhasil 😊");
     }
 
     public function edit(Request $request, $slug)
     {
-        $post = Post::with('user', 'media')->where('slug', $slug)->firstOrFail();
+        $post = Post::with("user", "media")
+            ->where("slug", $slug)
+            ->firstOrFail();
 
         // Authorization check
         if (
             $post->user_id !== auth()->id() &&
-            !auth()->user()->hasRole(['staff', 'superadmin'])
+            !auth()
+                ->user()
+                ->hasRole(["staff", "superadmin"])
         ) {
-            abort(403, 'Unauthorized action.');
+            abort(403, "Unauthorized action.");
         }
 
         // Mapping untuk dropdown
         $postType = [
-            'feed' => 'Feed',
-            'carousel' => 'Carousel',
-            'story' => 'Story',
-            'reel' => 'Reel',
+            "feed" => "Feed",
+            "carousel" => "Carousel",
+            "story" => "Story",
+            "reel" => "Reel",
         ];
 
         $status = [
-            'draft' => 'Draft',
-            'published' => 'Published',
-            'revision' => 'Revision',
+            "draft" => "Draft",
+            "published" => "Published",
+            "revision" => "Revision",
         ];
-
-        // $typeKey = array_search(
-        //     $post->content_type,
-        //     [1, 2, 3, 4]
-        // );
 
         // Reverse mapping content_type → key
         $typeMap = [
-            1 => 'feed',
-            2 => 'carousel',
-            3 => 'story',
-            4 => 'reel',
+            1 => "feed",
+            2 => "carousel",
+            3 => "story",
+            4 => "reel",
         ];
 
-        $type = $typeMap[$post->content_type] ?? 'feed';
+        $type = $typeMap[$post->content_type] ?? "feed";
 
         $tags = Tag::latest()->get();
-        
 
-        return view('post.edit', compact('postType', 'status', 'type', 'post', 'tags'));
+        return view(
+            "post.edit",
+            compact("postType", "status", "type", "post", "tags"),
+        );
     }
-
 
     public function update(Request $request, $slug)
     {
-        $post = Post::where('slug', $slug)->firstOrFail();
+        $post = Post::where("slug", $slug)->firstOrFail();
 
         if (
             $post->user_id !== auth()->id() &&
-            !auth()->user()->hasRole(['staff', 'superadmin'])
+            !auth()
+                ->user()
+                ->hasRole(["staff", "superadmin"])
         ) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized action.',
-            ], 403);
+            return response()->json(
+                [
+                    "success" => false,
+                    "message" => "Unauthorized action.",
+                ],
+                403,
+            );
         }
 
         // Validasi data utama
@@ -185,7 +190,11 @@ class PostController extends Controller
                 $originalSlug = $newSlug;
                 $counter = 1;
 
-                while (Post::where("slug", $newSlug)->where("id", "!=", $post->id)->exists()) {
+                while (
+                    Post::where("slug", $newSlug)
+                        ->where("id", "!=", $post->id)
+                        ->exists()
+                ) {
                     $newSlug = $originalSlug . "-" . $counter;
                     $counter++;
                 }
@@ -193,19 +202,22 @@ class PostController extends Controller
                 $validated["slug"] = $newSlug;
             }
 
-            $hashtags = array_unique($request->input('hashtag', []));
-            $validated['hashtag'] = array_values($hashtags);
+            $hashtags = array_unique($request->input("hashtag", []));
+            $validated["hashtag"] = array_values($hashtags);
             $validated["content_type"] = $post->content_type;
             $post->update($validated);
 
-            $oldPreviews = $request->input('old_previews', []);
-            $mediaCollection = $post->getMediaCollectionName($post->content_type);
+            $oldPreviews = $request->input("old_previews", []);
+            $mediaCollection = $post->getMediaCollectionName(
+                $post->content_type,
+            );
 
             $existingMedia = $post->getMedia($mediaCollection);
-            foreach ($existingMedia as $media) {
-                $mediaUrl = $media->getUrl(); // Define mediaUrl here
-                if (!in_array($mediaUrl, $oldPreviews)) {
-                    $media->delete();
+            if (!empty($oldPreviews)) {
+                foreach ($existingMedia as $media) {
+                    if (!in_array($media->getUrl(), $oldPreviews)) {
+                        $media->delete();
+                    }
                 }
             }
 
@@ -215,39 +227,43 @@ class PostController extends Controller
 
             if ($request->expectsJson()) {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Post berhasil diperbarui!',
-                    'data' => $post->load('media', 'user'),
+                    "success" => true,
+                    "message" => "Post berhasil diperbarui!",
+                    "data" => $post->load("media", "user"),
                 ]);
             }
 
-            return redirect()->route('post.detail', $post->slug)->with('success', 'Post berhasil diperbarui! 🎉');
-
+            return redirect()
+                ->route("post.detail", $post->slug)
+                ->with("success", "Post berhasil diperbarui! 🎉");
         } catch (\Throwable $e) {
-            \Log::error('💥 Update Post Error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
+            \Log::error("💥 Update Post Error: " . $e->getMessage(), [
+                "trace" => $e->getTraceAsString(),
             ]);
 
             if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Gagal memperbarui post: ' . $e->getMessage(),
-                ], 500);
+                return response()->json(
+                    [
+                        "success" => false,
+                        "message" =>
+                            "Gagal memperbarui post: " . $e->getMessage(),
+                    ],
+                    500,
+                );
             }
 
-            return back()->withInput()->with('error', 'Gagal memperbarui post!');
+            return back()
+                ->withInput()
+                ->with("error", "Gagal memperbarui post!");
         }
     }
 
-
     public function detail($slug)
     {
-        // Ambil post + relasi user & media
         $post = Post::with("user", "media")
-            ->where("slug", $slug) // Mencari post yang slug-nya sesuai dengan parameter $slug
+            ->where("slug", $slug)
             ->firstOrFail();
 
-        // Mapping angka ke nama tipe
         $typeMap = [
             1 => "feed",
             2 => "carousel",
@@ -257,7 +273,6 @@ class PostController extends Controller
 
         $type = $typeMap[$post->content_type] ?? "feed";
 
-        // Tentukan aspek rasio dan warna badge
         switch ($type) {
             case "feed":
             case "carousel":
@@ -277,16 +292,13 @@ class PostController extends Controller
                 break;
         }
 
-        // Ambil media sesuai tipe
         if (in_array($type, ["carousel", "story"])) {
             // Jika carousel atau story, ambil semua file
             $media_urls = $post->getMedia($type)->map(fn($m) => $m->getUrl());
         } else {
-            // Selain itu hanya 1 file (feed, reel)
             $media_urls = collect([$post->getFirstMediaUrl($type)]);
         }
 
-        // Nama pengguna fallback
         $username = $post->user->name ?? "Pengguna Tidak Dikenal";
 
         $tags = Tag::latest()->get();
@@ -300,7 +312,7 @@ class PostController extends Controller
                 "badge_color",
                 "media_urls",
                 "username",
-                "tags"
+                "tags",
             ),
         );
     }
@@ -322,7 +334,11 @@ class PostController extends Controller
 
         $likeCount = $post->likes()->count();
         $commentsCount = $post->comments()->count();
-        $likes = $post->likes()->with("user:id,username,fullname,image")->latest()->get();
+        $likes = $post
+            ->likes()
+            ->with("user:id,username,fullname,image")
+            ->latest()
+            ->get();
 
         return response()->json([
             "liked" => $isLiked,
@@ -441,64 +457,76 @@ class PostController extends Controller
     public function destroy(Request $request, $slug)
     {
         try {
-            $post = Post::where('slug', $slug)->firstOrFail();
+            $post = Post::where("slug", $slug)->firstOrFail();
 
             // Authorization check
             if (
                 $post->user_id !== auth()->id() &&
-                !auth()->user()->hasRole(['staff', 'superadmin'])
+                !auth()
+                    ->user()
+                    ->hasRole(["staff", "superadmin"])
             ) {
                 if ($request->expectsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Unauthorized action.',
-                    ], 403);
+                    return response()->json(
+                        [
+                            "success" => false,
+                            "message" => "Unauthorized action.",
+                        ],
+                        403,
+                    );
                 }
-                abort(403, 'Unauthorized action.');
+                abort(403, "Unauthorized action.");
             }
 
             // Hapus semua relasi terlebih dahulu
             $post->likes()->delete();
             $post->comments()->delete();
-            
+
             // Hapus media files
-            $mediaCollection = $post->getMediaCollectionName($post->content_type);
+            $mediaCollection = $post->getMediaCollectionName(
+                $post->content_type,
+            );
             $post->clearMediaCollection($mediaCollection);
-            
+
             // Hapus post secara permanen
             $post->forceDelete();
 
             if ($request->expectsJson()) {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Post berhasil dihapus permanen!',
+                    "success" => true,
+                    "message" => "Post berhasil dihapus permanen!",
                 ]);
             }
-
-            notify()->success('Post berhasil dihapus permanen 🗑️', 'Berhasil!');
-            return redirect()->route('home');
-
+            return redirect()->route("home");
         } catch (\Throwable $e) {
-            \Log::error('💥 Delete Post Error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
+            \Log::error("💥 Delete Post Error: " . $e->getMessage(), [
+                "trace" => $e->getTraceAsString(),
             ]);
 
             if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Gagal menghapus post: ' . $e->getMessage(),
-                ], 500);
+                return response()->json(
+                    [
+                        "success" => false,
+                        "message" =>
+                            "Gagal menghapus post: " . $e->getMessage(),
+                    ],
+                    500,
+                );
             }
 
-            notify()->error('Gagal menghapus post!', 'Error!');
             return back();
         }
     }
 
-
     public function revision(Request $request, $slug)
     {
-        $post = Post::where('slug', $slug)->firstOrFail();
+        $post = Post::where("slug", $slug)->firstOrFail();
+
+        if ($post->user_id !== Auth::id()) {
+            return redirect()
+                ->back()
+                ->with("error", "You are not allowed to revise this post.");
+        }
 
         $postType = [
             "feed" => "Feed",
@@ -517,22 +545,21 @@ class PostController extends Controller
 
         $tags = Tag::latest()->get();
 
-        return view('post.revision', [
-            'postType' => $postType,
-            'status' => $status,
-            'oldPost' => $post,
-            'type' => $type,
-            'tags' => $tags
+        return view("post.revision", [
+            "postType" => $postType,
+            "status" => $status,
+            "oldPost" => $post,
+            "type" => $type,
+            "tags" => $tags,
         ]);
     }
 
-
     public function storeRevision(Request $request, $slug)
     {
-        $oldPost = Post::where('slug', $slug)->firstOrFail();
+        $oldPost = Post::where("slug", $slug)->firstOrFail();
 
         // Ubah status post lama menjadi 'revision'
-        $oldPost->update(['status' => 'revision']);
+        $oldPost->update(["status" => "revision"]);
 
         // Validasi sesuai content type
         try {
@@ -558,34 +585,35 @@ class PostController extends Controller
 
         // Buat post baru hasil revisi
         $newPost = Post::create([
-            'user_id' => Auth::id(),
-            'title' => $request->input('title', $oldPost->title),
-            'caption' => $request->input('caption', $oldPost->caption),
-            'content_type' => $oldPost->content_type,
-            'status' =>  $request->input('status', $oldPost->status),// tetap sama seperti sebelum direvisi
-            'hashtag' => $oldPost->hashtag,
-            'post_at' => now(),
-            'slug' => Str::slug($oldPost->title) . '-rev-' . time(),
+            "user_id" => Auth::id(),
+            "title" => $request->input("title", $oldPost->title),
+            "caption" => $request->input("caption", $oldPost->caption),
+            "content_type" => $oldPost->content_type,
+            "status" => $request->input("status", $oldPost->status), // tetap sama seperti sebelum direvisi
+            "hashtag" => $oldPost->hashtag,
+            "post_at" => now(),
+            "slug" => Str::slug($oldPost->title) . "-rev-" . time(),
         ]);
 
         // Simpan komentar revisi ke tabel revisions
         Revision::create([
-            'user_id' => Auth::id(),
-            'post_id' => $oldPost->id,
-            'new_post_id' => $newPost->id,
-            'comment' => $request->input('revision_comment', 'Perbaikan konten'),
-            'rev_at' => now(),
-            'rev_number' => Revision::where('post_id', $oldPost->id)->count() + 1,
+            "user_id" => Auth::id(),
+            "post_id" => $oldPost->id,
+            "new_post_id" => $newPost->id,
+            "comment" => $request->input(
+                "revision_comment",
+                "Perbaikan konten",
+            ),
+            "rev_at" => now(),
+            "rev_number" =>
+                Revision::where("post_id", $oldPost->id)->count() + 1,
         ]);
 
         // Upload media baru ke post hasil revisi
         $newPost->attachMedia($request);
 
         return redirect()
-            ->route('home')
-            ->with('success', 'Revisi berhasil dibuat!');
+            ->route("home")
+            ->with("success", "Revisi berhasil dibuat!");
     }
-
-
-
 }

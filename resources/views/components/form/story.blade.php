@@ -1,6 +1,7 @@
-@props(['status' => [],
-        'selectedStatus' => 1,
-        'postAt' => date('Y-m-d')
+@props([
+    'status' => [],
+    'selectedStatus' => 1,
+    'postAt' => date('Y-m-d')
 ])
 
 
@@ -75,7 +76,6 @@
                 {{-- === AREA PREVIEW UTAMA === --}}
                     <div class="relative w-full aspect-[9/16] bg-slate-800 border-2 border-dashed border-gray-500 rounded-xl overflow-hidden">
 
-                        {{-- Gambar utama --}}
                         <template x-if="activePreview">
                             <img
                                 :src="activePreview"
@@ -85,15 +85,12 @@
                             >
                         </template>
 
-                        {{-- Jika belum ada gambar --}}
                         <div
                             x-show="!activePreview"
                             class="absolute inset-0 flex items-center justify-center text-gray-300 text-sm"
                         >
                             Belum ada gambar
                         </div>
-
-                        {{-- Tombol Navigasi --}}
                         <button
                             type="button"
                             @click="prev()"
@@ -114,7 +111,6 @@
                             &#10095;
                         </button>
 
-                        {{-- Tombol hapus --}}
                         <button
                             type="button"
                             @click="removeImage(current)"
@@ -126,7 +122,6 @@
                             </svg>
                         </button>
 
-                        {{-- Indikator posisi --}}
                         <div
                             x-show="previews.length > 0"
                             class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-xs"
@@ -136,7 +131,6 @@
                     </div>
 
 
-                    {{-- === LIST THUMBNAIL === --}}
                     <div class="flex flex-wrap gap-2">
                         <template x-for="(thumb, i) in previews" :key="i">
                             <img
@@ -147,7 +141,6 @@
                             >
                         </template>
 
-                        {{-- Tombol Upload --}}
                         <label class="flex flex-col items-center justify-center w-24 h-32 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-slate-800 hover:bg-slate-700 transition duration-150">
                             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
@@ -183,12 +176,10 @@
         // Dideklarasikan di window agar tersedia secara global
         window.postForm = function() {
             return {
-                // Inisialisasi dari prop atau nilai default
                 selectedStatus: 1,
                 postAt: '{{ $postAt }}',
                 title: '',
 
-                // Variabel untuk file upload
                 files: [],
                 previews: [],
                 current: 0,
@@ -211,7 +202,6 @@
                     });
 
                     Promise.all(readers).then(results => {
-                        // Masukkan semua hasil sekaligus → 1x trigger reactivity
                         this.previews.push(...results);
 
                         if (this.previews.length === results.length) this.current = 0;

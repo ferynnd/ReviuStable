@@ -32,3 +32,22 @@
         });
     </script>
 @endif
+
+@if ($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let messages = {!! json_encode($errors->all()) !!};
+            let errorText = messages.join('\n');
+            Swal.fire({
+                icon: 'error',
+                title: 'Validasi Gagal!',
+                text: errorText,
+                confirmButtonColor: '#ff2056',
+                timer: 4000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        });
+    </script>
+@endif

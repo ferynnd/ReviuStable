@@ -1,4 +1,4 @@
-@props(['postType' => [], 'status' => [] , 'type' => [] ])
+@props(['postType' => [], 'status' => [] , 'type' => [] , 'tags' => [] ])
 
 <div class="flex flex-col items-center justify-center">
         <div class="flex  w-full justify-between items-center pb-6 border-b border-gray-700">
@@ -31,12 +31,12 @@
 
 
         @if($type === 'feed')
-            <x-form.feed :status="$status"/>
+            <x-form.feed :status="$status" :tags="$tags"/>
         @elseif($type === 'carousel')
-            <x-form.carousel :status="$status"/>
+            <x-form.carousel :status="$status" :tags="$tags"/>
         @elseif($type === 'story')
-            <x-form.story :status="$status"/>
+            <x-form.story :status="$status" :tags="$tags"/>
         @elseif($type === 'reel')
-            <x-form.reel :status="$status"/>
+            <x-form.reel :status="$status" :tags="$tags"/>
         @endif
 </div>

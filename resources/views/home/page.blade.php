@@ -2,17 +2,21 @@
 
 <div class="max-w-2xl mx-auto">
 
-    <header 
-        class="sticky top-0 z-50 h-20 flex items-center justify-between px-6 border-b border-slate-700 
+    <header
+        class="sticky top-0 z-50 h-20 flex items-center justify-between px-6 border-b border-slate-700
                bg-slate-900/90 backdrop-blur supports-[backdrop-filter]:bg-slate-900/70">
         <div class="text-lg font-semibold text-cyan-400">Home</div>
         <div class="w-1/2 lg:w-1/3">
-            <input 
-                type="search" 
-                placeholder="Search..." 
-                class="w-full py-2 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white 
-                       placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-400"
-            >
+            <form action="{{ route('home') }}" method="GET">
+                <input
+                    type="search"
+                    name="search"
+                    value="{{ $request->search ?? '' }}"
+                    placeholder="Search.."
+                    class="w-full py-2 px-4 bg-slate-800 border border-slate-700 rounded-lg text-white
+                            placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                >
+            </form>
         </div>
     </header>
 

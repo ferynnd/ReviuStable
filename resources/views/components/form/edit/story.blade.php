@@ -2,7 +2,8 @@
     'oldpost',
     'status' => [],
     'selectedStatus' => 1,
-    'postAt' => date('Y-m-d')
+    'postAt' => date('Y-m-d'),
+    'tags' => []
 ])
 
 <form
@@ -72,17 +73,14 @@
         </div>
 
             <div class="space-y-2">
-                <label class="block text-sm font-semibold text-white">Image Story 
+                <label class="block text-sm font-semibold text-white">Image Story
                     <span class="text-xs text-gray-400 mt-1 italic">
                         *Gambar lama akan tetap digunakan jika tidak mengganti file baru.
                     </span>
                 </label>
 
-
-                {{-- === AREA PREVIEW UTAMA === --}}
                     <div class="relative w-full aspect-[9/16] bg-slate-800 border-2 border-dashed border-gray-500 rounded-xl overflow-hidden">
 
-                        {{-- Gambar utama --}}
                         <template x-if="activePreview">
                             <img
                                 :src="activePreview"
@@ -92,7 +90,6 @@
                             >
                         </template>
 
-                        {{-- Jika belum ada gambar --}}
                         <div
                             x-show="!activePreview"
                             class="absolute inset-0 flex items-center justify-center text-gray-300 text-sm"
@@ -100,7 +97,6 @@
                             Belum ada gambar
                         </div>
 
-                        {{-- Tombol Navigasi --}}
                         <button
                             type="button"
                             @click="prev()"
@@ -121,7 +117,6 @@
                             &#10095;
                         </button>
 
-                        {{-- Tombol hapus --}}
                         <button
                             type="button"
                             @click="removeImage(current)"
@@ -133,7 +128,6 @@
                             </svg>
                         </button>
 
-                        {{-- Indikator posisi --}}
                         <div
                             x-show="previews.length > 0"
                             class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-xs"
@@ -158,7 +152,6 @@
                             <input type="hidden" name="old_previews[]" :value="url">
                         </template>
 
-                        {{-- Tombol Upload --}}
                         <label class="flex flex-col items-center justify-center w-24 h-32 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-slate-800 hover:bg-slate-700 transition duration-150">
                             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
@@ -199,10 +192,10 @@
             selectedStatus: initial.selectedStatus || 'draft',
             postAt: initial.postAt || '{{ date("Y-m-d") }}',
 
-            files: [],      // Menyimpan objek File asli
-            oldPreviews: initial.oldPreviews || [], // dari server (URL asli media lama)
-            previews: initial.oldPreviews ? [...initial.oldPreviews] : [], // campuran lama + baru
-            current: 0, // Indeks file yang sedang ditampilkan
+            files: [],
+            oldPreviews: initial.oldPreviews || [],
+            previews: initial.oldPreviews ? [...initial.oldPreviews] : [],
+            current: 0,
 
             get activePreview() {
                 return this.previews.length > 0 ? this.previews[this.current] : null;
@@ -246,7 +239,6 @@
                 if (i < 0 || i >= this.previews.length) return;
 
                 const removed = this.previews[i];
-                // kalau yang dihapus berasal dari media lama, hapus juga dari oldPreviews
                 this.oldPreviews = this.oldPreviews.filter(url => url !== removed);
 
                 this.files.splice(i, 1);
@@ -258,5 +250,3 @@
     }
 </script>
 @endpush
-
-

@@ -10,7 +10,7 @@
             <div class="text-lg font-semibold text-cyan-400">Post Content</div>
         </header>
 
-         <main class="py-8 px-4 sm:px-4 mx-auto max-w-md">
+         <main class="py-8 px-4 sm:px-4 mx-auto max-w-md mb-14">
              <x-post-create :post-type="$postType" :status="$status" :type="$type" :tags="$tags"/>
         </main>
 

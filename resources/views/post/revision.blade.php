@@ -10,8 +10,8 @@
             <div class="text-lg font-semibold text-cyan-400">Revisi Content</div>
         </header>
 
-         <main class="py-8 px-4 sm:px-4 mx-auto max-w-md">
-             <x-post-revision :post-type="$postType" :status="$status" :type="$type" :oldPost="$oldPost" />
+         <main class="py-8 px-4 sm:px-4 mx-auto max-w-md mb-14">
+             <x-post-revision :post-type="$postType" :status="$status" :type="$type" :oldPost="$oldPost"  :tags="$tags" />
         </main>
 
 

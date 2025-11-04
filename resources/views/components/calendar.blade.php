@@ -4,15 +4,13 @@
     $DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 @endphp
 
-<div class="antialiased min-h-screen py-12 px-4 sm:px-4">
+<div class="antialiased min-h-screen py-12 px-4 sm:px-4 mb-12">
     <div class="max-w-5xl w-full mx-auto text-gray-100">
 
-        <!-- FILTER -->
         <div class="bg-gray-800 border border-slate-800 p-4 rounded-xl shadow-lg flex flex-wrap justify-end items-center gap-2">
             <form method="GET" action="{{ route('calendar.page') }}" class="flex flex-wrap gap-2 items-center">
-                
-                <!-- BULAN -->
-                <div class="relative md:w-42 w-1/2">
+
+                <div class="relative md:w-42 w-full">
                     <select
                         name="month"
                         class="appearance-none w-full px-5 py-3 rounded-lg border-2 border-slate-800 bg-gray-600 text-gray-100 focus:ring-sky-400 focus:border-sky-400 pr-10 leading-tight"
@@ -27,8 +25,7 @@
                     </svg>
                 </div>
 
-                <!-- TAHUN -->
-                <div class="relative md:w-42 w-1/2">
+                <div class="relative md:w-42 w-full">
                     <select
                         name="year"
                         class="appearance-none w-full px-5 py-3 rounded-lg border-2 border-slate-800 bg-gray-600 text-gray-100 focus:ring-sky-400 focus:border-sky-400 pr-10 leading-tight"
@@ -43,7 +40,7 @@
                     </svg>
                 </div>
 
-                <button 
+                <button
                     type="submit"
                     class="px-10 text-md py-2.5 md:w-42 w-full
                     bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700
@@ -55,7 +52,7 @@
 
         <!-- KALENDER -->
         <div class="bg-slate-900 mt-5 border border-slate-800 rounded-xl shadow-lg overflow-hidden">
-            
+
             <!-- Header Hari -->
             <div class="grid grid-cols-7 text-center py-3 bg-gray-800 border-b border-slate-700">
                 @foreach ($DAYS as $day)
@@ -78,7 +75,7 @@
 
                     <div class="h-24 border border-slate-800 p-2 relative hover:bg-slate-800/50 transition">
                         <a href="{{ route('calendar.list', ['date' => $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT) . '-' . str_pad($day, 2, '0', STR_PAD_LEFT)]) }}"
-                            class="block w-8 h-8 flex items-center justify-center rounded-full mb-1 font-semibold transition relative 
+                            class="block w-8 h-8 flex items-center justify-center rounded-full mb-1 font-semibold transition relative
                             {{ $isToday ? 'bg-gradient-to-b from-purple-500 to-violet-600 text-white' : 'text-slate-200 hover:bg-blue-500/20' }}">
                             {{ $day }}
 

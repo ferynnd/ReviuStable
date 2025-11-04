@@ -1,4 +1,5 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+@import "tailwind-scrollbar-hide/v4";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,73 +7,84 @@
 @source '../**/*.js';
 
 @font-face {
-  font-family: 'Satoshi-Light';
-  src: url('fonts/Satoshi-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-display: swap;
-  font-style: normal;
+    font-family: "Satoshi-Light";
+    src: url("fonts/Satoshi-Light.ttf") format("truetype");
+    font-weight: 300;
+    font-display: swap;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Satoshi-Regular';
-  src: url('fonts/Satoshi-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
-  font-style: normal;
+    font-family: "Satoshi-Regular";
+    src: url("fonts/Satoshi-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-display: swap;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Satoshi-Medium';
-  src: url('fonts/Satoshi-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-display: swap;
-  font-style: normal;
+    font-family: "Satoshi-Medium";
+    src: url("fonts/Satoshi-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-display: swap;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Satoshi-Bold';
-  src: url('fonts/Satoshi-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-display: swap;
-  font-style: normal;
+    font-family: "Satoshi-Bold";
+    src: url("fonts/Satoshi-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-display: swap;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Satoshi-Black';
-  src: url('fonts/Satoshi-Black.ttf') format('truetype');
-  font-weight: 900;
-  font-display: swap;
-  font-style: normal;
+    font-family: "Satoshi-Black";
+    src: url("fonts/Satoshi-Black.ttf") format("truetype");
+    font-weight: 900;
+    font-display: swap;
+    font-style: normal;
 }
 
 @theme {
-    --font-satoshi-light: 'Satoshi-Light', sans-serif;
-    --font-satoshi-regular: 'Satoshi-Regular', sans-serif;
-    --font-satoshi-medium: 'Satoshi-Medium', sans-serif;
-    --font-satoshi-bold: 'Satoshi-Bold', sans-serif;
-    --font-satoshi-black: 'Satoshi-Black', sans-serif;
+    --font-satoshi-light: "Satoshi-Light", sans-serif;
+    --font-satoshi-regular: "Satoshi-Regular", sans-serif;
+    --font-satoshi-medium: "Satoshi-Medium", sans-serif;
+    --font-satoshi-bold: "Satoshi-Bold", sans-serif;
+    --font-satoshi-black: "Satoshi-Black", sans-serif;
     --color-primary: #10162a;
     --color-secondary: #1e293c;
-    --spacing: 4px; 
-  }
+    --spacing: 4px;
+}
 
 /*
-==== CLASS FOR GRADIENT ===== 
+==== CLASS FOR GRADIENT =====
 bg-gradient-to-b from-cyan-400 to-sky-500 hover:from-sky-500 hover:to-blue-600
 bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700
 bg-gradient-to-b from-green-400 to-green-600 hover:from-green-500 hover:to-emerald-700
 */
 
 body {
-    font-family: 'Satoshi-Regular', sans-serif;
+    font-family: "Satoshi-Regular", sans-serif;
     margin: 0;
     padding: 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Satoshi-Bold', sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Satoshi-Bold", sans-serif;
 }
 
-p , span, a, li, td, th, div {
-    font-family: 'Satoshi-Regular', sans-serif;
+p,
+span,
+a,
+li,
+td,
+th,
+div {
+    font-family: "Satoshi-Regular", sans-serif;
 }

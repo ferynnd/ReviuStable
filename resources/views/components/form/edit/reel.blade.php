@@ -2,7 +2,8 @@
     'oldpost',
     'status' => [],
     'selectedStatus' => 1,
-    'postAt' => date('Y-m-d')
+    'postAt' => date('Y-m-d'),
+    'tags' => []
 ])
 
 <form
@@ -46,11 +47,11 @@
                 <select
                     id="status"
                     name="status"
-                    x-model.number="selectedStatus" 
+                    x-model.number="selectedStatus"
                     class="appearance-none w-full px-5 py-3 rounded-lg border-2 border-gray-500 bg-slate-800 text-gray-100 focus:ring-sky-400 focus:border-sky-400 pr-10 leading-tight"
                 >
                     @foreach ($status as $key => $label)
-                        <option value="{{ $key }}" {{ $key == $selectedStatus ? 'selected' : '' }}>{{ $label }}</option> 
+                        <option value="{{ $key }}" {{ $key == $selectedStatus ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </select>
 
@@ -111,8 +112,8 @@
                         playsinline
                         class="absolute inset-0 w-full h-full object-cover hover:grayscale-50" ></video>
 
-                           <input type="hidden" name="old_preview" :value="previews[0]">
-                           
+                    <input type="hidden" name="old_preview" :value="previews[0]">
+
                     <button
                         type="button"
                         @click.prevent="removeVideo()"class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-700 text-white p-1 rounded-full">
@@ -147,14 +148,18 @@
     </div>
 
     <div class="space-y-3">
+        @php
+            $tag = $tags->pluck('name');
+        @endphp
+
         <h3 class="block text-sm font-semibold text-white">Template Tags</h3>
-        <div class="flex flex-wrap justify-center gap-2 p-2 border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 rounded-lg">
+        <div x-data="{templateTags: @js($tag) }" class="flex flex-wrap justify-center gap-2 p-2 border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 rounded-lg">
             <template x-for="(tag, index) in templateTags" :key="index">
                 <span
-                x-text="tag"
-                class="px-2.5 py-1.5 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl">
-            </span>
-        </template>
+                    x-text="tag"
+                    class="px-2.5 py-1.5 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl">
+                </span>
+            </template>
         </div>
     </div>
 
@@ -228,16 +233,15 @@ window.postForm = function(initial = {}) {
         postAt: initial.postAt || '{{ date("Y-m-d") }}',
         optionalTags: initial.optionalTags || [],
 
-        
+
         files: [],
         previews: initial.oldPreviews || [],
-        templateTags: ['#jasawesite'],
         maxOptionalTags: 4,
         newOptionalTag: '',
         isAddingTag: false,
 
         get allTags() {
-            return [...new Set(this.templateTags.concat(this.optionalTags))];
+            return [...new Set(this.optionalTags)];
         },
 
         removeOptionalTag(index) {
@@ -257,7 +261,7 @@ window.postForm = function(initial = {}) {
                 }
                 tag = '#' + tag;
 
-                if (!this.optionalTags.includes(tag) && !this.templateTags.includes(tag)) {
+                if (!this.optionalTags.includes(tag)) {
                     this.optionalTags.push(tag);
                     this.newOptionalTag = '';
                 }
@@ -299,4 +303,3 @@ window.postForm = function(initial = {}) {
 }
 </script>
 @endpush
-

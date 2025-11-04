@@ -50,7 +50,7 @@
             likeCount: 0,
             commentCount: 0,
             shareUrl: '',
-            showShareModal: false, 
+            showShareModal: false,
 
             init() {
                 this.loadInitialStatus();
@@ -105,8 +105,8 @@
                             position: 'top-end',
                             icon: 'success',
                             title: 'Berhasil disukai!',
-                            showConfirmButton: false, 
-                            timer: 2000, 
+                            showConfirmButton: false,
+                            timer: 2000,
                             timerProgressBar: true
                         });
                     }
@@ -131,7 +131,6 @@
             },
 
             async shareContent() {
-                // Jika browser support native share
                 if (navigator.share) {
                     try {
                         await navigator.share({
@@ -172,7 +171,7 @@
                 } catch (error) {
                     this.shareUrl = window.location.href;
                 }
-                this.showShareModal = true; // ✅ PASTIKAN INI DIPANGGIL
+                this.showShareModal = true;
             },
 
             shareToPlatform(platform) {
@@ -205,18 +204,17 @@
                     document.body.removeChild(textArea);
                     this.showNotification('Link berhasil disalin!', 'success');
                 }
-                this.showShareModal = false; // ✅ TUTUP MODAL SETELAH COPY
+                this.showShareModal = false;
             },
 
-            // ✅ TAMBAHKAN METHOD showNotification
+
             showNotification(message, type = 'info') {
-                // Method 1: Dispatch event untuk notification global
                 this.$dispatch('notification', {
                     type: type,
                     message: message
                 });
             },
-            
+
         }
     }
 
@@ -228,16 +226,15 @@
             startX: 0,
             currentTranslate: 0,
             prevTranslate: 0,
-            
+
             init() {
                 if (this.mediaUrls.length === 0) {
                     this.mediaUrls = [null];
                 }
                 this.$watch('currentSlide', () => this.setSliderPosition(true));
-                this.setSliderPosition(false); // Set initial position
+                this.setSliderPosition(false);
             },
 
-            // Set the position of the slider based on currentSlide index
             setSliderPosition(animated = true) {
                 const slider = this.$refs.slider;
                 if (!slider) return;
@@ -247,12 +244,10 @@
                 } else {
                     slider.style.transition = 'none';
                 }
-                
-                // Set translate based on percentage (each slide is 100% of the container)
+
                 const percentTranslate = this.currentSlide * -100;
                 slider.style.transform = `translateX(${percentTranslate}%)`;
-                
-                // Store the pixel value for drag continuity (optional, but safer)
+
                 this.currentTranslate = percentTranslate * (slider.offsetWidth / 100);
                 this.prevTranslate = this.currentTranslate;
             },
@@ -260,10 +255,10 @@
             // Handle touch/mouse start
             startDrag(event) {
                 if (this.mediaUrls.length <= 1) return;
-                
+
                 this.isDragging = true;
                 this.startX = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-                
+
                 if (this.$refs.slider) {
                     this.$refs.slider.style.transition = 'none';
                 }
@@ -275,10 +270,9 @@
 
                 const currentX = event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
                 const diff = currentX - this.startX;
-                
-                // Calculate new position based on pixel drag
+
                 const newTranslate = this.prevTranslate + diff;
-                
+
                 this.$refs.slider.style.transform = `translateX(${newTranslate}px)`;
             },
 
@@ -289,30 +283,27 @@
 
                 const slider = this.$refs.slider;
                 if (!slider) return;
-                
+
                 // Calculate movement in pixels
                 const currentX = event.type.includes('mouse') ? event.pageX : event.changedTouches[0].clientX;
                 const movedBy = currentX - this.startX;
-                const threshold = slider.offsetWidth / 4; // Swipe threshold (25% of slide width)
+                const threshold = slider.offsetWidth / 4;
 
-                // Determine new slide index
                 if (movedBy < -threshold && this.currentSlide < this.mediaUrls.length - 1) {
                     this.currentSlide++;
                 } else if (movedBy > threshold && this.currentSlide > 0) {
                     this.currentSlide--;
                 }
-                
-                // Snap to the correct slide (position based on new currentSlide)
-                this.setSliderPosition(); 
+
+                this.setSliderPosition();
             },
 
             goToSlide(index) {
                 this.currentSlide = index;
             },
 
-            // Recalculate position on window resize
             handleResize() {
-                this.setSliderPosition(false); // No animation on resize
+                this.setSliderPosition(false);
             }
         }
     }
@@ -324,10 +315,11 @@
     <div class="p-4 flex justify-between items-start">
         <a href="{{ route('profile.page' , $post->user->username )}}" class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                </svg>
+                <img
+                    src="{{ $post->user->image ? asset('storage/' . $post->user->image) : 'https://ui-avatars.com/api/?name='.urlencode($post->user->fullname).'&background=0D8ABC&color=fff' }}"
+                    class="w-full h-full rounded-full object-cover border-2 border-slate-700 shadow mx-auto sm:mx-0"
+                    alt="{{ $post->user->fullname }}"
+                >
             </div>
             <div>
                 <span class="text-white font-semibold">{{ $username }}</span>
@@ -341,6 +333,7 @@
 
         <!-- Dropdown Menu -->
         <div x-data="{ open: false }" @click.outside="open = false" class="relative">
+            @if (Auth::id() === $post->user_id)
             <button @click="open = !open" class="text-gray-400 hover:text-white focus:outline-none p-1 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
@@ -349,13 +342,13 @@
             <div x-show="open" x-transition class="absolute right-0 mt-2 w-40 rounded-lg shadow-2xl bg-gray-700 ring-1 ring-gray-600 z-60">
                 @role(['staff', 'superadmin'])
                     {{-- Ganti link hapus dengan form --}}
-                    <form 
-                        action="{{ route('post.delete', $post->slug) }}" 
+                    <form
+                        action="{{ route('post.delete', $post->slug) }}"
                         x-ref="deleteForm"
                         @submit.prevent method="POST" class="inline">
                         @csrf
                         @method('DELETE')
-                        <button type="button" 
+                        <button type="button"
                                 class="flex items-center px-4 py-2 text-sm text-red-400 hover:bg-gray-600 rounded-t-lg w-full text-left"
                                 @click="
                                     Swal.fire({
@@ -379,24 +372,24 @@
                     <a href="{{ route('post.edit', $post->slug) }}" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600">Edit</a>
                 @endrole
                 @role('staff')
-                <a href="{{ route('post.revision', $post->slug) }}"
-                    class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 rounded-b-lg">
-                    Revisi
-                </a>
+                    <a href="{{ route('post.revision', $post->slug) }}"
+                        class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 rounded-b-lg">
+                        Revisi
+                    </a>
                 @endrole
             </div>
+            @endif
         </div>
     </div>
 
-    <!-- Media Content -->
-    <div 
+    <div
         x-data="postCarousel({{ json_encode($media_urls) }})"
         x-init="init"
         @resize.window="handleResize()"
         class="relative mx-4 mb-4 bg-slate-600 rounded-lg overflow-hidden {{ $aspect_class }}"
     >
         <div
-            class="flex w-full h-full cursor-grab"
+            class="flex w-full h-full cursor-grab touch-none"
             x-ref="slider"
             @mousedown.prevent="startDrag"
             @mousemove.prevent="drag"
@@ -407,6 +400,7 @@
             @touchend.prevent="endDrag"
             @touchcancel.prevent="endDrag"
             :class="{ 'cursor-grabbing': isDragging }"
+            style="touch-action: pan-y;"
         >
             @foreach ($media_urls as $url)
                 <div class="flex-none w-full h-full flex items-center justify-center">
@@ -421,8 +415,7 @@
             @endforeach
         </div>
 
-        {{-- ✅ Instagram-style counter indicator --}}
-        <div 
+        <div
             x-show="mediaUrls.length > 1"
             class="absolute top-3 right-3 bg-black/50 text-white text-xs font-medium px-2 py-1 rounded-full z-10 select-none"
         >

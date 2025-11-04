@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "alpinejs": "^3.15.0",
-        "sweetalert2": "^11.26.2"
+        "sweetalert2": "^11.26.2",
+        "tailwind-scrollbar-hide": "^4.0.0"
     }
 }
