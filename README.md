@@ -1,61 +1,103 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 ReviuStable
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+ReviuStable adalah aplikasi web yang dirancang sebagai **alat manajemen konten media sosial** internal. Aplikasi ini berfungsi sebagai platform kolaborasi bagi **staf media sosial** dan **reviewer konten/kepala divisi** untuk menilai, mengelola, dan memastikan kelayakan publikasi konten media sosial.
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 💻 Fitur Utama
 
-## Learning Laravel
+* **Manajemen Konten:** Memungkinkan staf media sosial untuk mengunggah dan mengatur draf konten.
+* **Sistem Review:** Menyediakan alur kerja di mana reviewer/kepala divisi dapat memberikan penilaian dan umpan balik terhadap konten.
+* **Penentuan Kelayakan:** Menetapkan status konten (layak/tidak layak publish).
+* **Kolaborasi Tim:** Memudahkan komunikasi dan koordinasi antara tim pembuat konten dan tim peninjau.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## ⚙️ Panduan Instalasi (Untuk Pengembang)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Ikuti langkah-langkah di bawah ini untuk mengatur dan menjalankan proyek secara lokal.
 
-## Laravel Sponsors
+### Prasyarat
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Pastikan Anda telah menginstal yang berikut ini di sistem Anda. Versi yang direkomendasikan adalah:
 
-### Premium Partners
+* **PHP:** Direkomendasikan **v8.3**
+* **Composer**
+* **Node.js:** Direkomendasikan **v20**
+* **npm:** Direkomendasikan **v10.8**
+* **Database** (MySQL, PostgreSQL, dll.)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Langkah-langkah
 
-## Contributing
+1.  **Clone Repository**
+    ```bash
+    git clone [https://github.com/ferynnd/ReviuStable.git](https://github.com/ferynnd/ReviuStable.git)
+    ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2.  **Masuk ke Directory Proyek**
+    ```bash
+    cd ReviuStable
+    ```
 
-## Code of Conduct
+3.  **Instal Dependensi PHP (via Composer)**
+    ```bash
+    composer install
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4.  **Konfigurasi Environment**
+    Salin file contoh konfigurasi environment:
+    ```bash
+    cp .env.example .env
+    ```
 
-## Security Vulnerabilities
+5.  **Generate Application Key**
+    Hasilkan kunci aplikasi unik untuk keamanan:
+    ```bash
+    php artisan key:generate
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6.  **Konfigurasi Database**
+    Buka file **`.env`** yang baru dibuat dan sesuaikan pengaturan koneksi database (DB\_DATABASE, DB\_USERNAME, DB\_PASSWORD, dll.) dengan kredensial lokal Anda.
 
-## License
+7.  **Jalankan Migrasi Database**
+    Jika proyek Anda memiliki tabel yang didefinisikan dalam folder `database/migrations`:
+    ```bash
+    php artisan migrate
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+8.  **Isi Data Awal (Seeding)**
+    Jalankan seeder untuk mengisi data awal (misalnya, akun pengguna default, peran, atau pengaturan dasar):
+    ```bash
+    php artisan db:seed
+    ```
+
+9.  **Buat Symbolic Link untuk Storage**
+    Buat symlink agar file yang diunggah dapat diakses publik:
+    ```bash
+    php artisan storage:link
+    ```
+
+10. **Instal Dependensi Node.js**
+    Instal semua paket front-end yang dibutuhkan:
+    ```bash
+    npm install
+    ```
+
+11. **Kompilasi Aset Frontend**
+    Kompilasi atau transpilasi aset CSS dan JavaScript:
+    ```bash
+    npm run dev
+    # Atau gunakan 'npm run watch' untuk pengembangan
+    ```
+
+12. **Jalankan Server Lokal**
+    Mulai server pengembangan Laravel:
+    ```bash
+    php artisan serve
+    ```
+    Aplikasi sekarang akan dapat diakses, biasanya di `http://127.0.0.1:8000`.
+
+---
+
