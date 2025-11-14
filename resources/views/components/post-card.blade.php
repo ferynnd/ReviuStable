@@ -400,7 +400,7 @@
             @touchend.prevent="endDrag"
             @touchcancel.prevent="endDrag"
             :class="{ 'cursor-grabbing': isDragging }"
-            style="touch-action: pan-y;"
+            style="touch-action: none;"
         >
             @foreach ($media_urls as $url)
                 <div class="flex-none w-full h-full flex items-center justify-center">

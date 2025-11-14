@@ -98,6 +98,12 @@ Route::middleware("auth")->group(function () {
             PostController::class,
             "storeRevision",
         ])->name("post.revision.store");
+        Route::get("/weekly", [PostController::class, "weeklyIndex"])->name(
+            "post.weekly",
+        );
+        Route::post("/weekly", [PostController::class, "storeWeekly"])->name(
+            "post.weekly.store",
+        );
     });
 
     Route::prefix("users")

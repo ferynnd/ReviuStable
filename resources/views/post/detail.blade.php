@@ -790,12 +790,12 @@
                     <span class="text-sm font-semibold text-cyan-300">Tags</span>
                     <div class="flex flex-wrap justify-start gap-1 py-2">
                         @foreach($tags ?? [] as $tag)
-                            <span class="px-2 py-1 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl">
+                            <span class="px-2 py-1.5 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl">
                                 #{{ $tag->name }}
                             </span>
                         @endforeach
                         @foreach($post->hashtag ?? [] as $tag)
-                            <span class="px-2 py-1 text-sm font-normal bg-gradient-to-b from-purple-500 to-violet-600 hover:from-violet-600 hover:to-indigo-700 text-white rounded-2xl">
+                            <span class="px-2 py-1.5 text-sm font-normal bg-gradient-to-b from-cyan-500 to-sky-600 hover:from-sky-600 hover:to-blue-600 text-white rounded-2xl">
                                 {{$tag}}
                             </span>
                         @endforeach

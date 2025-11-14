@@ -15,6 +15,10 @@ class HashtagController extends Controller
 
     public function store(Request $request)
     {
+        if (Tag::count() >= 10) {
+            return redirect()->route('tags.index')->with('error', 'Maksimal 10 hashtag yang diperbolehkan!');
+        }
+        
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:tags,name',
         ]);

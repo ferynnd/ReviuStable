@@ -133,7 +133,7 @@
             <div class="hidden md:block"></div>
             <div class="hidden md:block"></div>
             <div class="hidden md:block"></div>
-            <a  @click.prevent="open = true" class="group flex justify-center items-center gap-x-3 mt-5 rounded-md p-4 text-sm font-semibold bg-gradient-to-b from-cyan-400 to-sky-500 hover:from-sky-500 hover:to-blue-600 text-slate-200">
+            <a  @click.prevent="open = true" class="group flex justify-center items-center gap-x-3 mt-5 rounded-md p-4 text-sm font-semibold bg-gradient-to-b from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-slate-200">
                 Change Password
             </a>
             {{-- <a href="{{ route('password.request')}}" class="group flex justify-center items-center gap-x-3 mt-5 rounded-md p-4 text-sm font-semibold bg-gradient-to-b from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-slate-200">

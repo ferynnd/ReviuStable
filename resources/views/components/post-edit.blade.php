@@ -1,17 +1,4 @@
-@props(['postType' => [], 'status' => [], 'type' => '', 'post', 'tags' => []])
-
-@php
-    // Mapping angka ke string type
-    $typeMap = [
-        1 => 'feed',
-        2 => 'carousel',
-        3 => 'story',
-        4 => 'reel',
-    ];
-
-    $currentType = $typeMap[$post->content_type] ?? $type;
-@endphp
-
+@props(['postType' => [], 'status' => [], 'type' => '', 'post', 'tags' => [], 'mediaIds' => []])
 
 <div class="flex flex-col items-center justify-center">
     <div class="flex w-full justify-between items-center pb-6 border-b border-gray-700">
@@ -19,12 +6,12 @@
             <div class="space-y-2">
                 <div class="relative">
                     <select
+                        onchange="window.location='?type='+this.value"
                         name="type"
-                        disabled
-                        class="appearance-none w-full px-5 py-3 rounded-lg border-2 border-gray-500 bg-slate-800 text-gray-100 focus:ring-sky-400 focus:border-sky-400 pr-10 leading-tight cursor-not-allowed opacity-70"
+                        class="appearance-none w-full px-5 py-3 rounded-lg border-2 border-gray-300 bg-slate-800 text-white focus:ring-sky-400 focus:border-sky-400 pr-10 leading-tight opacity-70"
                     >
                         @foreach ($postType as $key => $label)
-                            <option value="{{ $key }}" {{ $currentType === $key ? 'selected' : '' }}>
+                            <option value="{{ $key }}" {{ $type === $key ? 'selected' : '' }}>
                                 {{ $label }}
                             </option>
                         @endforeach
@@ -42,17 +29,14 @@
         </div>
     </div>
 
-    @php
-        $currentType = $post->type ?? $type;
-    @endphp
 
-    @if($currentType === 'feed')
-        <x-form.edit.feed :oldpost="$post" :status="$status" :tags="$tags" />
-    @elseif($currentType === 'carousel')
-        <x-form.edit.carousel :oldpost="$post" :status="$status" :tags="$tags"  />
-    @elseif($currentType === 'story')
-        <x-form.edit.story :oldpost="$post" :status="$status" :tags="$tags"  />
-    @elseif($currentType === 'reel')
-        <x-form.edit.reel :oldpost="$post" :status="$status" :tags="$tags"  />
+    @if($type === 'feed')
+        <x-form.edit.feed :oldpost="$post" :status="$status" :tags="$tags" :mediaIds="$mediaIds" />
+    @elseif($type === 'carousel')
+        <x-form.edit.carousel :oldpost="$post" :status="$status" :tags="$tags" :mediaIds="$mediaIds"  />
+    @elseif($type === 'story')
+        <x-form.edit.story :oldpost="$post" :status="$status" :tags="$tags" :mediaIds="$mediaIds"  />
+    @elseif($type === 'reel')
+        <x-form.edit.reel :oldpost="$post" :status="$status" :tags="$tags" :mediaIds="$mediaIds"  />
     @endif
 </div>

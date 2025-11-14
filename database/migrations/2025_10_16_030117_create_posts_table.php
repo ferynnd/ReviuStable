@@ -20,8 +20,8 @@ return new class extends Migration {
                 ->cascadeOnUpdate();
 
             $table->string("title", 150);
-            $table->text("caption");
-            $table->tinyinteger("content_type"); // 1 = feed, 2 = carousel, 3 = story, 4 = reels
+            $table->text("caption")->nullable();
+            $table->tinyinteger("content_type")->nullable(); // 1 = feed, 2 = carousel, 3 = story, 4 = reels
             $table
                 ->enum("status", ["draft", "published", "revision"])
                 ->default("draft");

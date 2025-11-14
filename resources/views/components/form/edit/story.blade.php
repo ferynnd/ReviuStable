@@ -22,7 +22,7 @@
     @csrf
     @method('PUT')
 
-    <input type="hidden" name="content_type" value="{{ $oldpost->content_type }}">
+    <input type="hidden" name="content_type" value="3">
 
         <div class="flex w-full flex-col lg:flex-row gap-3">
             <div class="space-y-2 flex-1">
@@ -61,14 +61,24 @@
 
             <div class="space-y-2 w-1/2">
                 <label for="post_at" class="block text-sm font-semibold text-white">Date</label>
-                <input
-                    type="date"
-                    id="post_at"
-                    name="post_at"
-                    x-model="postAt"
-                    placeholder=""
-                    class="w-full px-4 py-2.5 rounded-lg fill-white border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150"
-                >
+                <div class="relative">
+                    <input
+                        type="date"
+                        id="post_at"
+                        name="post_at"
+                        x-model="postAt" {{-- Sinkronisasi tanggal dengan nilai awal dari prop --}}
+                        placeholder=""
+                        class="w-full px-4 py-2.5 rounded-lg fill-white border-2 border-gray-500 bg-slate-800 hover:bg-slate-800/70 outline-0 text-white placeholder-gray-400 focus:ring-sky-400 focus:border-sky-400 transition duration-150 calendar-input"
+                    >
+
+                    <!-- Icon custom -->
+                    <svg class="w-5 h-5 text-white absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                        fill="none" stroke="currentColor" stroke-width="1.5"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
             </div>
         </div>
 

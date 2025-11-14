@@ -40,9 +40,25 @@
 
         {{-- Staff only: Post --}}
         @role('staff')
+        {{-- Menu Weekly --}}
+        <a href="{{ route('post.weekly') }}"
+        class="inline-flex flex-col items-center justify-center px-5 transition
+                {{ request()->routeIs('post.weekly') ? 'text-cyan-500' : 'text-gray-400 hover:text-cyan-400' }}">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+                <path d="M10 14h4" />
+                <path d="M12 12v4" />
+            </svg>
+            <span class="text-xs">Week</span>
+        </a>
+
         <a href="{{ route('post.index') }}"
            class="inline-flex flex-col items-center justify-center px-5 transition
-                  {{ request()->routeIs('post.*') ? 'text-cyan-500' : 'text-gray-400 hover:text-cyan-400' }}">
+                  {{ request()->routeIs('post.index') ? 'text-cyan-500' : 'text-gray-400 hover:text-cyan-400' }}">
             <svg xmlns="http://www.w3.org/2000/svg"
                  class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor">

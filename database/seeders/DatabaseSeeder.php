@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
                 $user->update([
                     'fullname' => $data['fullname'],
                     'username' => $data['username'],
-                    'password' => Hash::make('123'),
+                    'password' => Hash::make('1234'),
                     'is_active' => true,
                 ]);
             } else {
@@ -61,7 +61,7 @@ class DatabaseSeeder extends Seeder
                     'fullname' => $data['fullname'],
                     'username' => $data['username'],
                     'email' => $data['email'],
-                    'password' => Hash::make('123'),
+                    'password' => Hash::make('1234'),
                     'is_active' => true,
                 ]);
             }

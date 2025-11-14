@@ -26,7 +26,6 @@ class PostController extends Controller
         $status = [
             "draft" => "Draft",
             "published" => "Published",
-            "revision" => "Revision",
         ];
 
         $type = $request->query("type", "feed");
@@ -121,7 +120,6 @@ class PostController extends Controller
         $status = [
             "draft" => "Draft",
             "published" => "Published",
-            "revision" => "Revision",
         ];
 
         // Reverse mapping content_type → key
@@ -132,7 +130,7 @@ class PostController extends Controller
             4 => "reel",
         ];
 
-        $type = $typeMap[$post->content_type] ?? "feed";
+        $type = $request->query("type", $typeMap[$post->content_type] ?? "feed");
 
         $tags = Tag::latest()->get();
 
@@ -165,6 +163,7 @@ class PostController extends Controller
         $validated = $request->validate([
             "title" => "required|string|max:150",
             "caption" => "nullable|string",
+            "content_type" => "required|integer|in:1,2,3,4", // 1 = feed, 2 = carousel, 3 = story, 4 = reel
             "status" => "required|in:draft,published,revision",
             "hashtag" => "nullable",
             "post_at" => "nullable|date",
@@ -172,7 +171,7 @@ class PostController extends Controller
 
         try {
             // Deteksi file upload baru
-            if (in_array($post->content_type, [1, 4])) {
+            if (in_array($validated["content_type"], [1, 4])) {
                 // Feed/Reel → 1 file
                 $files = $request->hasFile("media")
                     ? [$request->file("media")]
@@ -204,12 +203,11 @@ class PostController extends Controller
 
             $hashtags = array_unique($request->input("hashtag", []));
             $validated["hashtag"] = array_values($hashtags);
-            $validated["content_type"] = $post->content_type;
             $post->update($validated);
 
             $oldPreviews = $request->input("old_previews", []);
             $mediaCollection = $post->getMediaCollectionName(
-                $post->content_type,
+                $validated["content_type"],
             );
 
             $existingMedia = $post->getMedia($mediaCollection);
@@ -538,7 +536,6 @@ class PostController extends Controller
         $status = [
             "draft" => "Draft",
             "published" => "Published",
-            "revision" => "Revision",
         ];
 
         $type = $request->query("type", "feed");
@@ -616,4 +613,81 @@ class PostController extends Controller
             ->route("home")
             ->with("success", "Revisi berhasil dibuat!");
     }
+
+    public function weeklyIndex()
+    {
+        return view("post.weekly");
+    }
+
+    public function storeWeekly(Request $request)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            "title" => "required|array|min:1|max:7",
+            "title.*" => "required|string|max:150",
+            "post_at" => "required|array|min:1|max:7",
+            "post_at.*" => "required|date|date_format:Y-m-d",
+        ], [
+            "title.required" => "Judul harus diisi",
+            "title.*.required" => "Setiap judul harus diisi",
+            "title.*.max" => "Judul maksimal 150 karakter",
+            "post_at.required" => "Tanggal posting harus diisi",
+            "post_at.*.required" => "Setiap tanggal posting harus diisi",
+            "post_at.*.date" => "Format tanggal tidak valid",
+        ]);
+
+        // Validasi bahwa jumlah title dan post_at sama
+        if (count($validated["title"]) !== count($validated["post_at"])) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(["error" => "Jumlah judul dan tanggal tidak sesuai"]);
+        }
+
+        try {
+            $createdPosts = 0;
+
+            // Loop untuk membuat post
+            foreach ($validated["post_at"] as $index => $date) {
+                $title = $validated["title"][$index] ?? 'Untitled';
+                
+                // Generate slug yang unik
+                $slug = Str::slug($title);
+                $originalSlug = $slug;
+                $counter = 1;
+
+                while (Post::where("slug", $slug)->exists()) {
+                    $slug = $originalSlug . "-" . $counter;
+                    $counter++;
+                }
+
+                
+                // Buat post
+                Post::create([
+                    "user_id" => auth()->id(),
+                    "title" => $title,
+                    "status" => "published",
+                    "slug" => $slug,
+                    "post_at" => $date,
+                ]);
+
+                $createdPosts++;
+            }
+
+            return redirect()
+                ->route("post.weekly")
+                ->with("success", "{$createdPosts} postingan mingguan berhasil disimpan!");
+
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error("Error storing weekly posts: " . $e->getMessage());
+            
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(["error" => "Terjadi kesalahan saat menyimpan postingan. Silakan coba lagi."]);
+        }
+    }
+
+
 }

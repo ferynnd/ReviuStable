@@ -88,3 +88,14 @@ th,
 div {
     font-family: "Satoshi-Regular", sans-serif;
 }
+
+.calendar-input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+}
+
+.calendar-input {
+    color-scheme: dark;
+}

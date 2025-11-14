@@ -46,6 +46,14 @@
 
           @role('staff')
           <li>
+            <a href="{{route('post.weekly')}}"
+              class="group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold
+                      {{ request()->routeIs('post.weekly') ? 'bg-slate-800 text-sky-400' : 'text-slate-200 hover:text-sky-400 hover:bg-slate-800' }}">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-report-medical"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M10 14l4 0" /><path d="M12 12l0 4" /></svg>
+              Week Content
+            </a>
+          </li>
+          <li>
             <a href="{{route('post.index')}}"
               class="group flex justify-center items-center gap-x-3 mt-5 rounded-md p-4 text-md/6 font-semibold bg-gradient-to-b from-cyan-400 to-sky-500 hover:from-sky-500 hover:to-blue-600 text-slate-200">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -81,7 +89,7 @@
                   @csrf
                   <button
                       class="group flex items-center gap-x-3 rounded-md p-3 text-md/6 font-semibold
-                             bg-gradient-to-b from-cyan-400 to-sky-500 hover:from-sky-500 hover:to-blue-600 text-slate-200
+                             bg-gradient-to-b from-rose-500 to-rose-700 hover:from-rose-500 hover:to-red-600 text-slate-200
                              shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
                       type="button"
                       @click="Swal.fire({
